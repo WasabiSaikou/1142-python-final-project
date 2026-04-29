@@ -4,7 +4,7 @@ from frontend.statistics import StatisticView
 class AppLayout(ft.Row):
     def __init__(self, page: ft.Page):
         # 初始化父類別 (Row)，讓整個佈局橫向排列
-        super().__init__(expand=True, spacing=0)
+        super().__init__(expand = True, spacing = 0)
         # self.main_page = page
         
         # --- [右側內容區] ---
@@ -12,8 +12,8 @@ class AppLayout(ft.Row):
         self.content_area = ft.Container(
             alignment = ft.Alignment.TOP_LEFT,
             expand = True,
-            padding = ft.Padding.only(left = 20, top = 15),
-            bgcolor = "#F1F3E6",
+            padding = 0,
+            bgcolor = "#F5F1EB",
             content = ft.Column(
                 controls = [
                     ft.Text("Dashboard", size = 30, weight = "bold"),
@@ -24,8 +24,8 @@ class AppLayout(ft.Row):
 
         # --- [左側選單區] ---
         self.sidebar = ft.Container(
-            width=250,
-            bgcolor = "#F5EDE0", # 參考手繪質感的米色
+            width = 210,
+            bgcolor = "#F5F1EB", # 參考手繪質感的米色
             border = ft.border.only(right = ft.BorderSide(1, "#807E7C")), # 右側線條邊框
             content = ft.Column(
                 controls = [
@@ -37,15 +37,18 @@ class AppLayout(ft.Row):
                     
                     # 2. 中間功能列表 (加上 expand=True 會佔滿中間空間，把設定推到底部)
                     ft.Container(
+                        width = 210,
                         expand = True,
                         content = ft.Column(
+                            scroll=ft.ScrollMode.AUTO,
+                            expand = True,
                             spacing = 5, # 讓按鈕之間有點間隔
                             controls = [
                                 # 改用字串名稱，保證圖示能顯示
                                 self.nav_item(ft.Icon(ft.Icons.DASHBOARD), "Dashboard", "dash"),
                                 self.nav_item(ft.Icon(ft.Icons.INSERT_CHART), "Statistics", "stat"),
                                 self.nav_item(ft.Icon(ft.Icons.HISTORY), "History", "hist"),
-                                # self.nav_item("pets", "Pet", "pet")
+                                # self.nav_item(ft.Icon(ft.Icons.PETS), "Pet", "pet")
                             ]
                         ),
                         padding = ft.padding.all(10), # 讓按鈕不要貼邊
@@ -53,9 +56,10 @@ class AppLayout(ft.Row):
                     
                     # 3. 底部設定按鈕
                     ft.Container(
+                        width = 210,
                         content = self.nav_item(ft.Icon(ft.Icons.SETTINGS), "Settings", "set"),
-                        padding = ft.padding.only(bottom = 20, top = 15, left = 5, right = 5),
-                        border = ft.border.only(top = ft.BorderSide(0.8, "#807E7C")), # 設定上方的橫線
+                        padding = ft.padding.only(bottom = 20, top = 15, left = 10, right = 20),
+                        # border = ft.border.only(top = ft.BorderSide(0.8, "#807E7C")), # 設定上方的橫線
                     ),
                 ],
                 spacing = 0,
@@ -71,7 +75,7 @@ class AppLayout(ft.Row):
         return ft.ListTile(
             # 直接用字串 "black" 避開 ft.Colors.BLACK87 可能的報錯
             # leading = ft.Icon(icon_name, color="black", size = 24),
-            width = 200,
+            width = 180,
             leading = icon_name,  
             title = ft.Text(
                 label, 
@@ -90,12 +94,17 @@ class AppLayout(ft.Row):
         # 根據點擊的 data 更新右側內容
         if clicked_data == "dash":
             self.content_area.content = ft.Text("Dashboard", size = 30)
+
         elif clicked_data == "stat":
-            self.content_area.content = ft.Text("Statistics", size = 30)
+            # self.content_area.content = ft.Text("Statistics", size = 30)
+            self.content_area.content = StatisticView()
+
         elif clicked_data == "hist":
             self.content_area.content = ft.Text("History", size = 30)
+
         # elif clicked_data == "pet":
             # self.content_area.content = ft.Text("Pet", size = 30)
+
         elif clicked_data == "set":
             self.content_area.content = ft.Text("Settings", size = 30)
             
