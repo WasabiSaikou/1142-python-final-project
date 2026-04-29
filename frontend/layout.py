@@ -1,6 +1,7 @@
 import flet as ft
 from frontend.statistics import StatisticView
 from frontend.history import HistoryView
+from frontend.dashboard import DashboardView
 
 
 class AppLayout(ft.Row):
@@ -96,6 +97,7 @@ class AppLayout(ft.Row):
         # 根據點擊的 data 更新右側內容
         if clicked_data == "dash":
             self.content_area.content = ft.Text("Dashboard", size = 30)
+            # self.content_area.content = DashboardView()
 
         elif clicked_data == "stat":
             # self.content_area.content = ft.Text("Statistics", size = 30)
