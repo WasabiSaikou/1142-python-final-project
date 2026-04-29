@@ -1,9 +1,9 @@
 {
-  "theme": "light",
-  "font_size": "medium",
-  "language": "English",
-  "week_starts_on": "Monday",
-  "reminder_enabled": true,
-  "reminder_time": "08:00",
-  "weekly_summary": true
+    "theme": "light",
+    "font_size": "medium",
+    "language": "English",
+    "week_starts_on": "Monday",
+    "reminder_enabled": true,
+    "reminder_time": "08:00",
+    "weekly_summary": true
 }

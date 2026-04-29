@@ -1,7 +1,7 @@
 [
-  {
-    "habit_id": "uuid-string",
-    "date": "2026-04-28",
-    "completed": true
-  }
+    {
+        "habit_id": "uuid-string",
+        "date": "2026-04-28",
+        "completed": true
+    }
 ]

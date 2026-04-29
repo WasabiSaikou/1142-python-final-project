@@ -1,7 +1,7 @@
 [
-  {
-    "id": "uuid-string",
-    "name": "Exercise",
-    "created_at": "2026-04-28"
-  }
+    {
+        "id": "uuid-string",
+        "name": "Exercise",
+        "created_at": "2026-04-28"
+    }
 ]
