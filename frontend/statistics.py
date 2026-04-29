@@ -17,7 +17,6 @@ class StatisticView(ft.Container):
         self.stat_sidebar = ft.Container(
             width = 250,
             alignment = ft.Alignment.TOP_LEFT,
-            # expand = True,
             padding = 0,
             bgcolor = "#F5F1EB", # 參考手繪質感的米色
             border = ft.border.only(right = ft.BorderSide(1, "#807E7C")), # 右側線條邊框

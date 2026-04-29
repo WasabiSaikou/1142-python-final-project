@@ -1,5 +1,7 @@
 import flet as ft
 from frontend.statistics import StatisticView
+from frontend.history import HistoryView
+
 
 class AppLayout(ft.Row):
     def __init__(self, page: ft.Page):
@@ -100,7 +102,7 @@ class AppLayout(ft.Row):
             self.content_area.content = StatisticView()
 
         elif clicked_data == "hist":
-            self.content_area.content = ft.Text("History", size = 30)
+            self.content_area.content = HistoryView()
 
         # elif clicked_data == "pet":
             # self.content_area.content = ft.Text("Pet", size = 30)
