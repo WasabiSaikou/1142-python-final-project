@@ -16,7 +16,11 @@ def main(page: ft.Page):
     # initial size of the window
     page.window.width = 1000
     page.window.height = 600
-    
+    # fonts
+    page.fonts = {
+        "CustomQuicksand": "/fonts/Quicksand-VariableFont_wght.ttf" # 路徑相對於 assets
+    }
+    page.theme = ft.Theme(font_family = "CustomQuicksand")
     # create layout instance
     app_layout = AppLayout(page)
     
@@ -36,9 +40,12 @@ def main(page: ft.Page):
     title_bar = ft.WindowDragArea(
         content = ft.Container(
             bgcolor = "#F1E9DC",
+            height = 30,
             padding = ft.padding.only(left = 5),
+            border = ft.border.only(bottom = ft.BorderSide(0.35, "#D3CFC8")),
             content = ft.Row([
-                ft.Text(" Habit Tracker", size = 15, color = "#7D673F", weight = "bold"),
+                # ft.Text(" Habit Tracker", size = 15, color = "#423621", weight = "W500"),
+                ft.Text(" Habit Tracker", size = 15, color = "#7D673F", weight = "W500"),
                 ft.Row([
                     ft.IconButton(  # minimize button
                         icon = ft.Icons.REMOVE, 
@@ -68,4 +75,4 @@ def main(page: ft.Page):
 
 # launch the application
 if __name__ == "__main__":
-    ft.app(target = main)
+    ft.app(target = main, assets_dir="assets")

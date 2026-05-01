@@ -65,6 +65,7 @@ class StatisticView(ft.Container):
                 # Title : Statistics
                 ft.Container(
                     width = 1400,
+                    bgcolor = "#F6EFE5",
                     padding = ft.padding.only(left = 25, top = 20, bottom = 20),
                     # 使用 Container 的邊框來取代 Divider，這樣線條才會 100% 延伸
                     border = ft.border.only(bottom = ft.BorderSide(0.5, "black12")),
@@ -103,10 +104,9 @@ class StatisticView(ft.Container):
             data = label,
             padding = ft.padding.symmetric(horizontal = 10, vertical = 12), # 增加上下間距
             border_radius = 8,
-            
-            ink = True,  # 啟用 Material 水波紋回饋
-            ink_color = "black12", # 點擊時的水波紋顏色
-            
+            ink = True,
+            ink_color = "black12",
+
             content = ft.Row(
                 vertical_alignment = ft.CrossAxisAlignment.START,
                 controls = [

@@ -34,8 +34,8 @@ class AppLayout(ft.Row):
 
         self.sidebar = ft.Container(
             width = 210,
-            bgcolor = "#F5F1EB",
-            border = ft.border.only(right = ft.BorderSide(0.5, ft.Colors.BLACK12)),
+            bgcolor = "#F5EBDB",
+            border = ft.border.only(right = ft.BorderSide(1, "#B0ABAB")),
             
             content = ft.Column(
                 spacing = 0,
