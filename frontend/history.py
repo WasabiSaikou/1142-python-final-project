@@ -1,10 +1,13 @@
 import flet as ft
+import calendar
+import datetime as dt
 from backend.habit_manager import get_all_habits
+from frontend.calender import HistoryCalendar
 
 class HistoryView(ft.Container):
     def __init__(self):
         super().__init__(expand = True, padding = 0)
-
+        
         # save all visited Container
         self.hist_items_list = []
 
@@ -12,8 +15,9 @@ class HistoryView(ft.Container):
         self.hist_detail = ft.Container(
             padding = 15,
             expand = True,
+            # content = self.create_detail_content("Running"), # 預設顯示 Running
             content = ft.Text("Select a habit to see details", size = 20, color = "grey"),
-            alignment = ft.Alignment.TOP_LEFT
+            alignment = ft.Alignment.TOP_CENTER
         )
 
         # left side : sidebar of hostory
@@ -39,14 +43,7 @@ class HistoryView(ft.Container):
                                 # habits list (need to import the data)
                                 self.hist_nav_item("Running"),
                                 self.hist_nav_item("Play games"),
-                                self.hist_nav_item("Sleep for 8 hours"),
-                                self.hist_nav_item("Get up early"),
-                                self.hist_nav_item("Clean the house"),
-                                self.hist_nav_item("Drink 6 bottles of water"),
-                                self.hist_nav_item("Water the flowers"),
-                                self.hist_nav_item("Reading"),
-                                self.hist_nav_item("Exercise"),
-                                self.hist_nav_item("Learning Python for 10 hours every day to build a great project") # 測試長名稱
+                                self.hist_nav_item("Reading")
                             ],
                             scroll = ft.ScrollMode.AUTO,
                             spacing = 5
@@ -66,7 +63,6 @@ class HistoryView(ft.Container):
                     width = 1400,
                     bgcolor = "#F6EFE5",
                     padding = ft.padding.only(left = 25, top = 20, bottom = 20),
-                    # 使用 Container 的邊框來取代 Divider，這樣線條才會 100% 延伸
                     border = ft.border.only(bottom = ft.BorderSide(0.5, "black12")),
                     content = ft.Column([
                         ft.Text("History", size = 30, weight = "bold"),
@@ -87,6 +83,14 @@ class HistoryView(ft.Container):
             ]
         )
 
+    def create_detail_content(self, habit_name):
+        """封裝右側內容的生成邏輯"""
+        return ft.Column(
+            controls = [HistoryCalendar(habit_name = habit_name)], 
+            scroll = ft.ScrollMode.AUTO, 
+            horizontal_alignment = ft.CrossAxisAlignment.CENTER
+        )
+
 
     def hist_nav_item(self, label):
         """產生單個習慣條目，支援文字自動換行與懸停變色"""
@@ -102,7 +106,7 @@ class HistoryView(ft.Container):
             on_hover = handle_hover,
             data = label,
             padding = ft.padding.symmetric(horizontal = 10, vertical = 12), # 增加上下間距
-            border_radius = 8,
+            border_radius = 5,
             ink = True,
             ink_color = "black12",
 
@@ -132,19 +136,24 @@ class HistoryView(ft.Container):
 
         # 1. 遍歷清單，更新所有條目的背景色
         for item in self.hist_items_list:
-            if item.data == clicked_label:
-                item.bgcolor = "black12"
-            else:
-                item.bgcolor = None
+            item.bgcolor = "black12" if item.data == clicked_label else None
             item.update()
 
-        # 2. 更新右側詳細內容
-        self.hist_detail.content = ft.Text(f"{clicked_label}", size = 20, weight = "bold")  # 根據點擊的 data 更新右側內容
-        self.hist_detail.update()  # 重新渲染畫面
+        """# 2. 重新建構右側內容
+        # 重點：將 HistoryCalendar 包在一個 Column 裡並給它 expand=True
+        self.hist_detail.content = ft.Column(
+            controls=[
+                ft.Text(f"{clicked_label} - 2026 May", size=28, weight="bold"),
+                ft.Divider(height=20, color="transparent"),
+                # 這裡直接呼叫你的日曆類別
+                HistoryCalendar(habit_name=clicked_label) 
+            ],
+            expand=True, # 確保佔滿右側
+            scroll=ft.ScrollMode.AUTO # 如果日曆太長可以滾動
+        )"""
 
-        # ==============================
-        #         輸入圖表套件
-        # ==============================
+        # 2. **核心銜接點**：更換右側 Detail 內容
+        # 我們直接重新建立整個 Column，並傳入新的 habit_name 給 HistoryCalendar
+        self.hist_detail.content = self.create_detail_content(clicked_label)
 
-        
-  
+        self.hist_detail.update()

@@ -1,4 +1,6 @@
 import flet as ft
+import calendar
+import datetime as dt
 from backend.habit_manager import get_all_habits
 
 class StatisticView(ft.Container):
@@ -67,7 +69,6 @@ class StatisticView(ft.Container):
                     width = 1400,
                     bgcolor = "#F6EFE5",
                     padding = ft.padding.only(left = 25, top = 20, bottom = 20),
-                    # 使用 Container 的邊框來取代 Divider，這樣線條才會 100% 延伸
                     border = ft.border.only(bottom = ft.BorderSide(0.5, "black12")),
                     content = ft.Column([
                         ft.Text("Statistics", size = 30, weight = "bold"),

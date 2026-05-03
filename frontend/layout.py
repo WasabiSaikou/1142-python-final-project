@@ -33,7 +33,7 @@ class AppLayout(ft.Row):
         setting_item = self.nav_item(ft.Icon(ft.Icons.SETTINGS), "Setting")
 
         self.sidebar = ft.Container(
-            width = 210,
+            width = 250,
             bgcolor = "#F5EBDB",
             border = ft.border.only(right = ft.BorderSide(1, "#B0ABAB")),
             
@@ -41,11 +41,11 @@ class AppLayout(ft.Row):
                 spacing = 0,
                 controls = [
                     ft.Container(   # Title : MENU
-                        content = ft.Text("MENU", size = 35, weight = "bold"),
-                        padding = ft.padding.only(top = 30, bottom = 30, left = 20)
+                        content = ft.Text("MENU", size = 40, weight = "bold"),
+                        padding = ft.padding.only(top = 30, bottom = 30, left = 40)
                     ),
                     ft.Container(   # Intermediate function list
-                        width = 210,
+                        width = 250,
                         expand = True,
                         padding = ft.padding.all(10),
                         content = ft.Column(
@@ -82,7 +82,7 @@ class AppLayout(ft.Row):
             margin = ft.margin.symmetric(horizontal = 10, vertical = 2),
             content=ft.ListTile(
                 leading = icon_name,
-                title = ft.Text(label, size = 14, weight = "w500"),
+                title = ft.Text(label, size = 20, weight = "w500"),
                 on_click = self.on_nav_change,
                 data = label,
             )

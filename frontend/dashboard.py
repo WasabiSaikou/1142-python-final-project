@@ -1,4 +1,6 @@
 import flet as ft
+import datetime as dt
+import calendar
 from backend.habit_manager import get_all_habits, add_habit, delete_habit
 
 class DashboardView(ft.Container):
@@ -13,11 +15,19 @@ class DashboardView(ft.Container):
             # you need to use ft.Row to put "title, date" and "button of add habit" to a row
             # write your code here
 
+            content = ft.Row(
+                controls = [
+                    ft.Column(
+                        controls = [
+                            ft.Text("Dashboard", size = 30, weight = "bold"),
+                            # Date
+                            ft.Text(str(dt.date.today()), size = 15)
+                        ]
+                    ),
+                    # button : add habit (靠右)
 
-
-            
-            
-
+                ]
+            )
         )
 
 
@@ -29,7 +39,7 @@ class DashboardView(ft.Container):
         self.dashboard_content = ft.Container(
             # you need to use ft.Column, and remember to use scroll (頁面滾輪)
             # write your code here
-
+            
 
 
 
