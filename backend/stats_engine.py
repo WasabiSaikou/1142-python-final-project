@@ -1,10 +1,25 @@
 from datetime import datetime, timedelta
 from . import habit_manager, log_manager
 
-def get_prev_date(date:str) -> str:
+def get_prev_date(date: str) -> str:
     curr = datetime.strptime(date, "%Y-%m-%d")
     prev = curr - timedelta(days = 1)
     return prev.strftime("%Y-%m-%d")
+
+def get_next_date(date: str) -> str:
+    curr = datetime.strptime(date, "%Y-%m-%d")
+    next = curr + timedelta(days = 1)
+    return next.strftime("%Y-%m-%d")
+
+def get_create_date(habit_id: str) -> str:
+    habits = habit_manager.get_all_habits()
+    habit = [habit for habit in habits if habit["id"] == habit_id]
+    return habit[0]["created_at"]
+    
+def check_date_in_habit(habit_id: str, date: str) -> bool:
+    created_at = get_create_date(habit_id)
+    today = datetime.now().strftime("%Y-%m-%d")
+    return created_at <= date <= today
 
 def get_current_streak(habit_id: str) -> int:
     streak = 0
@@ -21,12 +36,10 @@ def get_current_streak(habit_id: str) -> int:
         
     return streak
 
-def get_longest_streak(habit_id:str) -> int:
+def get_longest_streak(habit_id: str) -> int:
     longest_streak = 0
     curr_streak = 0
-    habits = habit_manager.get_all_habits()
-    habit = [habit for habit in habits if habit["id"] == habit_id]
-    created_at = habit[0]["created_at"]
+    created_at = get_create_date(habit_id)
     
     curr = datetime.now().strftime("%Y-%m-%d")
     
@@ -34,7 +47,6 @@ def get_longest_streak(habit_id:str) -> int:
         curr_streak = 1
         longest_streak = 1
         
-    
     if curr == created_at:
         return curr_streak
     
@@ -50,4 +62,34 @@ def get_longest_streak(habit_id:str) -> int:
         prev = get_prev_date(curr)
     
     return longest_streak
+
+def get_range_status(habit_id: str, from_date: str, to_date: str) -> list[bool | None]:
+    statuses = []
+    curr = from_date
+    while curr != get_next_date(to_date):
+        if not check_date_in_habit(habit_id, curr):
+            statuses.append(None)
+            curr = get_next_date(curr)
+            continue
+        status = log_manager.get_status(habit_id, curr)
+        if status == None:
+            statuses.append(False)
+        else:
+            statuses.append(status)
+        curr = get_next_date(curr)
+    return statuses
+    
+def get_range_rate(habit_id: str, from_date: str, to_date: str) -> float:
+    total = 0
+    completed = 0
+    statuses = get_range_status(habit_id, from_date, to_date)
+    for status in statuses:
+        if status == None:
+            continue
+        if status == True:
+            completed += 1
+        total += 1
+    if total == 0:
+        return 0.0
+    return completed / total
     
