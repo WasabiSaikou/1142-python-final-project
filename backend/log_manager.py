@@ -1,4 +1,3 @@
-import datetime
 from . import storage
 
 def create_log(habit_id: str, date: str) -> None:

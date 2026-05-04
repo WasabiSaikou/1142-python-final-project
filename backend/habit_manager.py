@@ -1,5 +1,5 @@
-import datetime
 import uuid
+from datetime import datetime
 from . import storage
 
 def get_all_habits() -> list[dict]:
@@ -10,7 +10,7 @@ def add_habit(name: str) -> None:
     habit = {
         "id": uuid.uuid4().hex,
         "name": name,
-        "created_at": datetime.datetime.now().strftime("%Y-%m-%d")
+        "created_at": datetime.now().strftime("%Y-%m-%d")
     }
     habits.append(habit)
     storage.save_habits(habits)
