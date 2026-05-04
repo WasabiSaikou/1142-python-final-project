@@ -1,6 +1,6 @@
 import json
 
-def load_habits():
+def load_habits() -> list[dict]:
     habits = []
     try:
         with open("data/habits.json", "r") as f:
@@ -14,12 +14,12 @@ def load_habits():
             json.dump([], f, indent = 4)
     return habits
 
-def save_habits(data):
+def save_habits(data: list[dict]) -> None:
     with open("data/habits.json", "w") as f:
         json.dump(data, f, indent = 4)
     return
 
-def load_logs():
+def load_logs() -> list[dict]:
     logs = []
     try:
         with open("data/logs.json", "r") as f:
@@ -33,11 +33,11 @@ def load_logs():
             json.dump([], f, indent = 4)
     return logs
 
-def save_logs(data):
+def save_logs(data: list[dict]) -> None:
     with open("data/logs.json", "w") as f:
         json.dump(data, f, indent = 4)
 
-def load_settings():
+def load_settings() -> dict:
     settings = {
     "theme": "light",
     "font_size": "medium",
@@ -59,6 +59,6 @@ def load_settings():
             json.dump(settings, f, indent = 4)
     return settings
     
-def save_settings(data):
+def save_settings(data: dict) -> None:
     with open("data/settings.json", "w") as f:
         json.dump(data, f, indent = 4)
