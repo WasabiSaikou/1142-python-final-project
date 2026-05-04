@@ -23,10 +23,9 @@ def toggle_check(habit_id: str, date: str) -> bool:
         create_log(habit_id, date)
     return True
 
-def get_today_status(habit_id: str) -> bool | None:
-    today = datetime.datetime.now().strftime("%Y-%m-%d")
+def get_status(habit_id: str, date:str) -> bool | None:
     logs = storage.load_logs()
-    matching = [log for log in logs if log["habit_id"] == habit_id and log["date"] == today]
+    matching = [log for log in logs if log["habit_id"] == habit_id and log["date"] == date]
     if matching:
         return matching[0]["completed"]
     return None
