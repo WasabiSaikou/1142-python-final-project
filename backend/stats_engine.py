@@ -93,3 +93,19 @@ def get_range_rate(habit_id: str, from_date: str, to_date: str) -> float:
         return 0.0
     return completed / total
     
+def get_cumulative_rate(habit_id: str, from_date: str, to_date:str) -> list[float]:
+    statuses = get_range_status(habit_id, from_date, to_date)
+    rates = []
+    curr = from_date
+    total = 0
+    completed = 0
+    for status in statuses:
+        if status == None:
+            rates.append(0.0)
+            continue
+        if status == True:
+            completed += 1
+        total += 1
+        rates.append(completed / total)
+    return rates
+        
