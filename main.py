@@ -2,7 +2,6 @@ import sys
 import flet as ft
 from frontend.layout import AppLayout
 
-
 def main(page: ft.Page):
     page.padding = 0
     page.spacing = 0
