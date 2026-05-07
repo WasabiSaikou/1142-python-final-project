@@ -1,5 +1,26 @@
+import json
+import calendar
 from datetime import datetime, timedelta
-from . import habit_manager, log_manager
+from . import habit_manager, log_manager, storage
+
+def get_week_range(date: str) -> dict[str: str]:
+    settings = storage.load_settings()
+    curr = datetime.strptime(date, "%Y-%m-%d")
+    if settings["week_starts_on"] == "Monday":
+        start = curr - timedelta(days = curr.weekday())
+    else:
+        if curr.weekday() == 6:
+            start = curr
+        else:
+            start = curr - timedelta(days = curr.weekday() + 1)
+    end = start + timedelta(days = 6)
+    return {"start": start.strftime("%Y-%m-%d"), "end": end.strftime("%Y-%m-%d")}
+
+def get_month_range(date: str) -> dict[str: str]:
+    start = date[:-2] + "01"
+    first_weekday, num_days = calendar.monthrange(int(start[0:4]), int(start[5:7]))
+    end = date[:-2] + str(num_days)
+    return {"start": start, "end": end}
 
 def get_prev_date(date: str) -> str:
     curr = datetime.strptime(date, "%Y-%m-%d")
@@ -108,4 +129,3 @@ def get_cumulative_rate(habit_id: str, from_date: str, to_date:str) -> list[floa
         total += 1
         rates.append(completed / total)
     return rates
-        
