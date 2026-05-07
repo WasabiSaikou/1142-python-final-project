@@ -1,4 +1,3 @@
-import json
 import calendar
 from datetime import datetime, timedelta
 from . import habit_manager, log_manager, storage
@@ -45,58 +44,51 @@ def check_date_in_habit(habit_id: str, date: str) -> bool:
 def get_current_streak(habit_id: str) -> int:
     streak = 0
     curr = datetime.now().strftime("%Y-%m-%d")
-    
-    if log_manager.get_status(habit_id, curr) == True:
-        streak += 1
-        
-    prev = get_prev_date(curr)
-    while log_manager.get_status(habit_id, prev) == True:
-        streak += 1
-        curr = prev
-        prev = get_prev_date(curr)
-        
+    statuses = get_range_status(habit_id, get_create_date(habit_id), curr)
+    statuses.reverse()
+    if statuses[0] == True:
+        streak = 1
+    del statuses[0]
+    for status in statuses:
+        if status != True:
+            break
+        streak +=  1
     return streak
 
 def get_longest_streak(habit_id: str) -> int:
     longest_streak = 0
     curr_streak = 0
-    created_at = get_create_date(habit_id)
-    
     curr = datetime.now().strftime("%Y-%m-%d")
-    
-    if log_manager.get_status(habit_id, curr) == True:
+    statuses = get_range_status(habit_id, get_create_date(habit_id), curr)
+    statuses.reverse()
+    if statuses[0] == True:
         curr_streak = 1
         longest_streak = 1
-        
-    if curr == created_at:
-        return curr_streak
-    
-    prev = get_prev_date(curr) 
-    while prev != get_prev_date(created_at):
-        if log_manager.get_status(habit_id, prev) == True:
-            curr_streak += 1
-        else:
+    del statuses[0]
+    for status in statuses:
+        if status != True:
             curr_streak = 0
+            continue
+        curr_streak +=  1
         if curr_streak > longest_streak:
             longest_streak = curr_streak
-        curr = prev
-        prev = get_prev_date(curr)
-    
     return longest_streak
 
 def get_range_status(habit_id: str, from_date: str, to_date: str) -> list[bool | None]:
     statuses = []
     curr = from_date
+    logs = log_manager.get_all_logs()
+    logs = [log for log in logs if log["habit_id"] == habit_id]
     while curr != get_next_date(to_date):
         if not check_date_in_habit(habit_id, curr):
             statuses.append(None)
             curr = get_next_date(curr)
             continue
-        status = log_manager.get_status(habit_id, curr)
-        if status == None:
-            statuses.append(False)
+        matching = [log for log in logs if log["date"] == curr]
+        if matching:
+            statuses.append(matching[0]["completed"])
         else:
-            statuses.append(status)
+            statuses.append(False)
         curr = get_next_date(curr)
     return statuses
     
