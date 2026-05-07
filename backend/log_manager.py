@@ -1,5 +1,8 @@
 from . import storage
 
+def get_all_logs() -> list[dict]:
+    return storage.load_logs()
+
 def create_log(habit_id: str, date: str) -> None:
     logs = storage.load_logs()
     log = {
