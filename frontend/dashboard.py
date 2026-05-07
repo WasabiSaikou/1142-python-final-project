@@ -160,21 +160,32 @@ class DashboardView(ft.Container):
                                         color = "#7BA753",
                                         bgcolor = None,      #"black12",
                                         height = 8,
-                                        border_radius = 4,
+                                        border_radius = 4
                                     ),
                                     expand=True, # 關鍵：讓進度條佔滿左邊剩餘的所有空間
                                 ),
                                 # 顯示百分比文字
-                                ft.Text(f"{self.get_progress(habit_id) * 100} %", size = 16, weight = "bold", color = "black87"),
+                                ft.Text(f"{self.get_progress(habit_id) * 100} %", size = 16, weight = "bold", color = "black87")
                             ],
                             alignment = ft.MainAxisAlignment.CENTER,
                             vertical_alignment = ft.CrossAxisAlignment.CENTER,
-                            spacing = 15, # 進度條與百分比之間的間距
+                            spacing = 15  # 進度條與百分比之間的間距
                         ),
                         ft.Row(
-                            controls=[self.build_card(d) for d in weekday],
-                            spacing=10, 
-                            alignment = ft.MainAxisAlignment.SPACE_BETWEEN)
+                            alignment = ft.MainAxisAlignment.SPACE_BETWEEN,
+                            spacing = 10,
+                            controls=[
+                                ft.Row(
+                                    controls=[self.build_card(d) for d in weekday],
+                                    spacing = 10, 
+                                    alignment = ft.MainAxisAlignment.SPACE_BETWEEN
+                                ),
+                                ft.Checkbox(
+                                    value = log_manager.get_status(habit_id, self.today.strftime("%Y-%m-%d")) == True,
+                                    on_change = lambda e: log_manager.toggle_check(habit_id, self.today.strftime("%Y-%m-%d"))
+                                )
+                            ]
+                        )
                     ]
                 )
             )
