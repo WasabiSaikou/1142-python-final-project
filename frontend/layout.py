@@ -105,11 +105,14 @@ class AppLayout(ft.Row):
 
         # update content based on the clicked item
         if clicked_label == "Dashboard":
-            self.content_area.content = ft.Text("Dashboard Content", size=30)
+            # self.content_area.content = ft.Text("Dashboard Content", size=30)
+            self.content_area.content = DashboardView()
         elif clicked_label == "Statistics":
-            self.content_area.content = StatisticView()
+            # self.content_area.content = StatisticView()
+            self.content_area.content = ft.Text("Statistics", size=30)
         elif clicked_label == "History":
-            self.content_area.content = HistoryView()
+            # self.content_area.content = HistoryView()
+            self.content_area.content = ft.Text("History", size=30)
         elif clicked_label == "Setting":
             self.content_area.content = ft.Text("Settings", size=30)
 

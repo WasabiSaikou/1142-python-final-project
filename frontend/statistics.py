@@ -1,7 +1,6 @@
 import flet as ft
-import calendar
-import datetime as dt
 from backend.habit_manager import get_all_habits
+from frontend.chart import StatisticalChart
 
 class StatisticView(ft.Container):
     def __init__(self):
@@ -10,23 +9,36 @@ class StatisticView(ft.Container):
         # save all visited Container
         self.stat_items_list = []
 
+        self.habit_list = get_all_habits()
+        # return [{"id": "abc", "name": "Running", "created_at": "2026-04-28"}, {"id": "efg", "name": "Reading", "created_at": "2026-04-30"}]
+
         # right side : detail of statistics
         self.stat_detail = ft.Container(
             padding = 15,
             expand = True,
             content = ft.Text("Select a habit to see details", size = 20, color = "grey"),
-            alignment = ft.Alignment.TOP_LEFT
+            alignment = ft.Alignment.TOP_CENTER
         )
+
+        # 沒有習慣資料時顯示提示
+        if not self.habit_list:
+            self.stat_detail.content = ft.Text("No habits were established.", size = 20, color = "grey")
+        else:
+            # 建立 Sidebar 項目，傳入整個習慣字典
+            sidebar_controls = [self.stat_nav_item(habit) for habit in self.habit_list]
+            # 初始化：預設顯示第一個習慣的日曆
+            first_habit = self.habit_list[0]
+            self.hist_detail.content = self.create_detail_content(first_habit["id"])
+            sidebar_controls[0].bgcolor = "black12" # 設定第一個為選取狀態      
 
         # left side : sidebar of statistics
         self.stat_sidebar = ft.Container(
             width = 250,
             alignment = ft.Alignment.TOP_LEFT,
             padding = 0,
-            bgcolor = "#F5F1EB",
+            bgcolor = "#F5EFE6",
             border = ft.border.only(right = ft.BorderSide(0.5, "black12")), # 右側線條邊框
             content = ft.Column(
-                # scroll = ft.ScrollMode.AUTO,
                 spacing = 0,
                 controls = [
                     # SELECT HABIT
@@ -38,19 +50,7 @@ class StatisticView(ft.Container):
                         expand = True,
                         padding = ft.padding.only(left = 5, right = 5),
                         content = ft.Column(
-                            controls = [
-                                # habits list (need to import the data)
-                                self.stat_nav_item("Running"),
-                                self.stat_nav_item("Play games"),
-                                self.stat_nav_item("Sleep for 8 hours"),
-                                self.stat_nav_item("Get up early"),
-                                self.stat_nav_item("Clean the house"),
-                                self.stat_nav_item("Drink 6 bottles of water"),
-                                self.stat_nav_item("Water the flowers"),
-                                self.stat_nav_item("Reading"),
-                                self.stat_nav_item("Exercise"),
-                                self.stat_nav_item("Learning Python for 10 hours every day to build a great project") # 測試長名稱
-                            ],  
+                            controls = sidebar_controls,
                             scroll = ft.ScrollMode.AUTO,
                             spacing = 5
                         )    
@@ -89,11 +89,19 @@ class StatisticView(ft.Container):
             ]
         )
 
+    def create_detail_content(self, habit_id):
+        """封裝右側內容的生成邏輯"""
+        return ft.Column(
+            controls = [StatisticalChart(habit_id = habit_id)], 
+            scroll = ft.ScrollMode.AUTO, 
+            horizontal_alignment = ft.CrossAxisAlignment.CENTER
+        )
 
-    def stat_nav_item(self, label):
-        """產生單個習慣條目，支援文字自動換行與懸停變色"""
 
-        # 內建 hover 處理
+    def stat_nav_item(self, habit_dict):
+        """產生成員條目，將字典存入 data"""
+
+        # 內建 hover 處理 (懸浮變色)
         def handle_hover(e):
             if e.control.bgcolor != "black12":
                 e.control.bgcolor = "black12" if e.data == "true" else None
@@ -102,9 +110,9 @@ class StatisticView(ft.Container):
         nav_item = ft.Container(
             on_click = self.stat_on_nav_change,
             on_hover = handle_hover,
-            data = label,
+            data = habit_dict,
             padding = ft.padding.symmetric(horizontal = 10, vertical = 12), # 增加上下間距
-            border_radius = 8,
+            border_radius = 5,
             ink = True,
             ink_color = "black12",
 
@@ -114,7 +122,7 @@ class StatisticView(ft.Container):
                     ft.Icon(ft.Icons.EVENT, size = 20, color = "#807E7C"),
                     # 使用 Expanded 強制文字佔滿剩餘寬度並觸發換行
                     ft.Text(
-                        value = label,
+                        value = habit_dict["name"], # 顯示習慣名稱
                         size = 16,
                         color = "black87",
                         overflow = ft.TextOverflow.VISIBLE, # 確保換行文字不會被截斷
@@ -130,27 +138,33 @@ class StatisticView(ft.Container):
     
 
     def stat_on_nav_change(self, e):
+        # 獲取點擊的習慣字典
+        habit_info = e.control.data
+        clicked_id = habit_info["id"]
+        click_name = habit_info["name"]
+
+        # 1. 更新側邊欄背景色
+        for item in self.stat_items_list:
+            item.bgcolor = "black12" if item.data["id"] == clicked_id else None
+            item.update()
+
+        # 2. 以 ID 為參數更新右側日曆
+        self.stat_detail.content = self.create_detail_content(clicked_id, click_name)
+        self.stat_detail.update()
+
+        '''
         # 獲取點擊的資料
         clicked_label = e.control.data
 
         # 1. 遍歷清單，更新所有條目的背景色
         for item in self.stat_items_list:
-            if item.data == clicked_label:
-                item.bgcolor = "black12"
-            else:
-                item.bgcolor = None
+            item.bgcolor = "black12" if item.data == clicked_label else None
             item.update()
 
         # 2. 更新右側詳細內容
-        self.stat_detail.content = ft.Text(f"{clicked_label}", size = 20, weight = "bold")  # 根據點擊的 data 更新右側內容
+        self.stat_detail.content = self.create_detail_content(clicked_label)
         self.stat_detail.update()  # 重新渲染畫面
-
-        # ==============================
-        #         輸入圖表套件
-        # ==============================
-
-        
-        
+        '''
 
     '''def stat_card(self, title, value, color):
         """這是一個簡單的統計卡片輔助函式"""

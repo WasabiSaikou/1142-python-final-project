@@ -42,7 +42,7 @@ def main(page: ft.Page):
             bgcolor = "#F1E9DC",
             height = 30,
             padding = ft.padding.only(left = 5),
-            border = ft.border.only(bottom = ft.BorderSide(0.35, "#D3CFC8")),
+            border = ft.Border.only(bottom = ft.BorderSide(0.35, "#D3CFC8")),
             content = ft.Row([
                 # ft.Text(" Habit Tracker", size = 15, color = "#423621", weight = "W500"),
                 ft.Text(" Habit Tracker", size = 15, color = "#7D673F", weight = "W500"),
