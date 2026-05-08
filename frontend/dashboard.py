@@ -140,7 +140,7 @@ class DashboardView(ft.Container):
                             ft.Text(habit_name, size = 20, weight = "bold"),
                             ft.Row(
                                 controls = [
-                                    ft.Text(f"{current_streak}-day streak", color = "black54"),
+                                    ft.Text(f"{current_streak}-day streak", color = "black54", weight = "bold"),
                                     ft.IconButton(ft.Icons.DELETE, icon_color = "black54", 
                                                     on_click = lambda e: self.handle_delete(habit_data))
                                 ],
@@ -186,7 +186,6 @@ class DashboardView(ft.Container):
                 ]
             )
         )
-        # self.habit_items_column.controls.append(habit_card)
         return habit_card
 
 
@@ -239,19 +238,27 @@ class DashboardView(ft.Container):
         self.habit_list = get_all_habits()
         self.habit_items_column.controls.clear()
         
-        for h in self.habit_list:
-            card = self.create_habit_dashboard(h)
-            self.habit_items_column.controls.append(card)
-        
+        if not self.habit_list:
+        # 如果為空，加入引導文字
+            self.habit_items_column.controls.append(
+                ft.Container(
+                    content = ft.Text(
+                        "Let's add a new habit.", 
+                        size = 20, 
+                        color = "black45",
+                        weight = "w500"
+                    ),
+                    alignment = ft.Alignment.CENTER,
+                )
+            )
+        else:
+            for h in self.habit_list:
+                card = self.create_habit_dashboard(h)
+                self.habit_items_column.controls.append(card)
+                
         if self.page:
             self.update()
 
-        '''
-        self.habit_items_column.controls.clear()
-        for h in self.habit_list:
-            self.habit_items_column.controls.append(self.create_habit_dashboard(h))
-        self.update()
-        '''
 
     # 當這個元件被掛載到 page 之後，Flet 會自動執行這裡
     def did_mount(self):

@@ -1,9 +1,8 @@
 import flet as ft
 import calendar
 import datetime
-# from backend.stats_engine import get_month_status   ### not yet
 from backend.log_manager import get_status # 以 id、日期為參數，輸出該天的完成狀況
-
+from backend.stats_engine import get_month_range, get_range_status
 
 class HistoryCalendar(ft.Container):
     def __init__(self, habit_id):
@@ -15,10 +14,6 @@ class HistoryCalendar(ft.Container):
             "year": self.today.year,
             "month": self.today.month,
         }
-
-        # habits 完成度資料
-        #self.habit_history_data = get_month_status(self.habit_id, self.state["year"], self.state["month"])
-        # returns {"2026-04-01": "completed", "2026-04-02": "missed", "2026-04-03": "not_started"}
 
         # 用來放置月曆格子的容器
         self.calendar_content = ft.Column(
@@ -39,34 +34,21 @@ class HistoryCalendar(ft.Container):
         
 
     def get_status_dot(self, date_str):     # 判斷日期狀態並回傳顏色
-        check_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
-        today_date = self.today.date()
-        
-        # 未來日期：不顯示點點
+        check_date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+        today_date = datetime.datetime.strptime(self.today.strftime("%Y-%m-%d"), "%Y-%m-%d")
+
         if check_date > today_date:
-            return None
+            return None         # future dates: don't show dots
         
-        # 2. 直接從字典中根據日期字串 (Key) 取得狀態 (Value)
-        # 使用 .get() 避免 Key 不存在時報錯
-        status = self.habit_history_data.get(date_str)
-
-        if status == "completed":
-            return "#58CD67"  # 綠色
-        elif status == "missed":
-            return "#F92828"  # 紅色
+        status = get_range_status(self.habit_id, date_str, date_str)
+        
+        if status[0] == True:
+            return "#58CD67"  # completed -> green
+        elif status[0] == False:
+            return "#F92828"  # missed -> red
         else:
-            # 過去日子但沒有紀錄，或是狀態為 "not_started"
-            return "#888888"  # 灰色
+            return "#888888"  # not_started -> gray
 
-        '''
-        # 搜尋對應習慣與日期的紀錄
-        record = next((item for item in self.habit_history_data 
-                       if item["date"] == date_str and item["habit_id"] == self.habit_id), None)
-        if record is not None:
-            return "#58CD67" if record["completed"] else "#F92828"  # 根據完成狀態回傳綠色或紅色
-        else:
-            return "#888888"    # 過去但沒有紀錄：顯示灰色 (Not started)
-        '''
 
     def build_calendar(self):
         self.calendar_content.controls.clear()
@@ -74,10 +56,10 @@ class HistoryCalendar(ft.Container):
         year = self.state["year"]
         month = self.state["month"]
 
-        # 取得月份資料
+        # month data
         month_list = calendar.monthcalendar(year, month)
 
-        # 標題與切換按鈕
+        # title and navigation buttons
         month_name = calendar.month_name[month] # 取得英文月份名稱
         header_row = ft.Row(
             controls=[
@@ -96,12 +78,10 @@ class HistoryCalendar(ft.Container):
         self.calendar_content.controls.append(header_row)
         self.calendar_content.controls.append(ft.Container(height = 10)) # 間距
 
-
-        # 專門包住「格線區」的容器 ---
+        # container for calendar grid
         grid_body = ft.Column(spacing = 0)
 
-        # 星期表頭 (Mon-Sun)
-        # calendar.setfirstweekday(calendar.SUNDAY) # 星期表頭 (Sun-Sat)
+        # week header
         days_header = ["Mon", "Tue", "Wed", "Thr", "Fri", "Sat", "Sun"]
         
         week_head = ft.Row(
@@ -119,23 +99,21 @@ class HistoryCalendar(ft.Container):
         )
         grid_body.controls.append(week_head)
 
-        # 日期格子
-        for week in month_list:
+        # date cells
+        for week in range(0, len(month_list)):
             week_row = ft.Row(spacing = 0, alignment = ft.MainAxisAlignment.CENTER)
-            for day in week:
-                # 建立格子的基礎內容：日期數字
+            for day in range(0, len(month_list[week])):
+                # basic cell with date number and status dot
                 content_stack = ft.Column(
-                    controls=[ft.Text(str(day) if day != 0 else "", size=16)],
+                    controls=[ft.Text(str(month_list[week][day]) if month_list[week][day] != 0 else "", size=16)],
                     alignment = ft.MainAxisAlignment.START,
                     horizontal_alignment = ft.CrossAxisAlignment.CENTER,
                     spacing = 8
                 )
-
-                # 如果當天有日期，檢查是否需要加入小點
-                if day != 0:
-                    date_str = f"{year}-{month:02d}-{day:02d}"
+                # check whether to add a status dot (only if there's a date, i.e., not 0)
+                if month_list[week][day] != 0:
+                    date_str = f"{year}-{month:02d}-{month_list[week][day]:02d}"
                     dot_color = self.get_status_dot(date_str)
-                    
                     if dot_color:
                         content_stack.controls.append(
                             ft.Container(
@@ -159,7 +137,7 @@ class HistoryCalendar(ft.Container):
                 week_row.controls.append(day_box)
             grid_body.controls.append(week_row)
 
-        # 加上最外圈的左邊與上邊線
+        # add borders to the entire grid by wrapping it in another container
         grid_container = ft.Container(
             content = grid_body,
             border = ft.border.only(
@@ -168,11 +146,11 @@ class HistoryCalendar(ft.Container):
             )
         )
 
-        # 最後將組好的 grid_container 放入主 Column
+        # put grid_container into main Column
         self.calendar_content.controls.append(grid_container) # 修正後的格線區
         self.calendar_content.controls.append(ft.Container(height = 20))
         
-        # 圖示點點說明欄 (Legend)
+        # legend
         legend_row = ft.Row(
             controls = [
                 ft.Row([ft.Container(width = 14, height = 14, border_radius = 7, bgcolor = "#58CD67"),
@@ -182,8 +160,8 @@ class HistoryCalendar(ft.Container):
                 ft.Row([ft.Container(width = 14, height = 14, border_radius = 7, bgcolor = "#888888"),
                         ft.Text(" : not started", size = 18)], alignment = ft.Alignment.TOP_LEFT)
             ],
-            alignment = ft.MainAxisAlignment.CENTER, # 說明欄水平置中
-            spacing = 90, # 各個說明項之間的間距
+            alignment = ft.MainAxisAlignment.CENTER,
+            spacing = 90,
         )
         self.calendar_content.controls.append(legend_row) 
 
@@ -198,9 +176,5 @@ class HistoryCalendar(ft.Container):
             self.state["month"] = 12
             self.state["year"] -= 1
 
-        # 切換月份後，重新呼叫後端函式取得該月份的資料
-        self.habit_history_data = get_month_status(self.habit_id, self.state["year"], self.state["month"])
-
         self.build_calendar()
         self.update()
-
