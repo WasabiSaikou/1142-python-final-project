@@ -6,7 +6,7 @@ class StatisticView(ft.Container):
     def __init__(self):
         super().__init__(expand = True, padding = 0)
 
-        # save all visited Container
+        # save all visited container
         self.stat_items_list = []
 
         self.habit_list = get_all_habits()
@@ -28,7 +28,7 @@ class StatisticView(ft.Container):
             sidebar_controls = [self.stat_nav_item(habit) for habit in self.habit_list]
             # 初始化：預設顯示第一個習慣的日曆
             first_habit = self.habit_list[0]
-            self.hist_detail.content = self.create_detail_content(first_habit["id"])
+            self.stat_detail.content = self.create_detail_content(first_habit["id"], first_habit["name"])
             sidebar_controls[0].bgcolor = "black12" # 設定第一個為選取狀態      
 
         # left side : sidebar of statistics
@@ -89,10 +89,10 @@ class StatisticView(ft.Container):
             ]
         )
 
-    def create_detail_content(self, habit_id):
+    def create_detail_content(self, habit_id, habit_name):
         """封裝右側內容的生成邏輯"""
         return ft.Column(
-            controls = [StatisticalChart(habit_id = habit_id)], 
+            controls = [StatisticalChart(habit_id = habit_id, habit_name = habit_name)], 
             scroll = ft.ScrollMode.AUTO, 
             horizontal_alignment = ft.CrossAxisAlignment.CENTER
         )
@@ -111,7 +111,7 @@ class StatisticView(ft.Container):
             on_click = self.stat_on_nav_change,
             on_hover = handle_hover,
             data = habit_dict,
-            padding = ft.padding.symmetric(horizontal = 10, vertical = 12), # 增加上下間距
+            padding = ft.padding.symmetric(horizontal = 10, vertical = 12),
             border_radius = 5,
             ink = True,
             ink_color = "black12",
@@ -151,32 +151,3 @@ class StatisticView(ft.Container):
         # 2. 以 ID 為參數更新右側日曆
         self.stat_detail.content = self.create_detail_content(clicked_id, click_name)
         self.stat_detail.update()
-
-        '''
-        # 獲取點擊的資料
-        clicked_label = e.control.data
-
-        # 1. 遍歷清單，更新所有條目的背景色
-        for item in self.stat_items_list:
-            item.bgcolor = "black12" if item.data == clicked_label else None
-            item.update()
-
-        # 2. 更新右側詳細內容
-        self.stat_detail.content = self.create_detail_content(clicked_label)
-        self.stat_detail.update()  # 重新渲染畫面
-        '''
-
-    '''def stat_card(self, title, value, color):
-        """這是一個簡單的統計卡片輔助函式"""
-        return ft.Container(
-            content=ft.Column([
-                ft.Text(title, size=16, color="black"),
-                ft.Text(value, size=24, weight="bold", color=color),
-            ]),
-            width=150,
-            height=100,
-            bgcolor="#F9F9F9",
-            border=ft.border.all(1, "black12"),
-            border_radius=10,
-            padding=15
-        )'''
