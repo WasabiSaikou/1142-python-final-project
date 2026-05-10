@@ -34,7 +34,7 @@ class StatisticalChart(ft.Container):
         completed = sum(1 for s in statuses if s is True)
         total = sum(1 for s in statuses if s is not None)
 
-        self.stats_row_area.controls = self.create_stat_card_controls(rate, completed, total, 0)
+        self.stats_row_area.controls = self.create_stat_card_controls(rate, completed, total, self.cur_streak)
 
 
     def validate_dates(self):

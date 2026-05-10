@@ -10,8 +10,8 @@ def main(page: ft.Page):
     page.window.title_bar_buttons_hidden = True
     page.window.resizable = True
     # minimize size of the window
-    page.window.min_width = 600
-    page.window.min_height = 400
+    page.window.min_width = 1000
+    page.window.min_height = 600
     # initial size of the window
     page.window.width = 1000
     page.window.height = 600
