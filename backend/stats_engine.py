@@ -55,11 +55,10 @@ def get_current_streak(habit_id: str) -> int:
         streak +=  1
     return streak
 
-def get_longest_streak(habit_id: str) -> int:
+def get_longest_streak(habit_id: str, from_date: str, to_date: str) -> int:
     longest_streak = 0
     curr_streak = 0
-    curr = datetime.now().strftime("%Y-%m-%d")
-    statuses = get_range_status(habit_id, get_create_date(habit_id), curr)
+    statuses = get_range_status(habit_id, from_date, to_date)
     statuses.reverse()
     if statuses[0] == True:
         curr_streak = 1
