@@ -3,7 +3,6 @@ from frontend.statistics import StatisticView
 from frontend.history import HistoryView
 from frontend.dashboard import DashboardView
 
-
 class AppLayout(ft.Row):
     def __init__(self, page: ft.Page):
         super().__init__(expand = True, spacing = 0)
@@ -11,18 +10,13 @@ class AppLayout(ft.Row):
         # save all visited Container
         self.nav_items_list = []
 
-        # right content area
+        # right content area, initially set to DashboardView
         self.content_area = ft.Container(
             alignment = ft.Alignment.TOP_LEFT,
             expand = True,
             padding = ft.padding.only(bottom = 5),
             bgcolor = "#F5F1EB",
-            content = ft.Column(
-                controls = [
-                    ft.Text("Dashboard", size = 30, weight = "bold"),
-                    ft.Text("date", size = 15)
-                ]
-            )
+            content = DashboardView()
         )
 
         # left menu area
@@ -63,9 +57,17 @@ class AppLayout(ft.Row):
             )
         )
 
+        self.set_initial_nav("Dashboard")
         # put sidebar and content in a Row
         self.controls = [self.sidebar, self.content_area]
 
+    # initial item
+    def set_initial_nav(self, label):
+        for item in self.nav_items_list:
+            if item.data == label:
+                item.bgcolor = "black12"
+            else:
+                item.bgcolor = None
 
     # layout item definition
     def nav_item(self, icon_name, label):
@@ -105,9 +107,10 @@ class AppLayout(ft.Row):
 
         # update content based on the clicked item
         if clicked_label == "Dashboard":
-            self.content_area.content = ft.Text("Dashboard Content", size=30)
+            self.content_area.content = DashboardView()
         elif clicked_label == "Statistics":
             self.content_area.content = StatisticView()
+            # self.content_area.content = ft.Text("Statistics", size=30)
         elif clicked_label == "History":
             self.content_area.content = HistoryView()
         elif clicked_label == "Setting":
