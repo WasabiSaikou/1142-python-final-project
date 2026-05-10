@@ -1,7 +1,8 @@
 import flet as ft
 import datetime
 import re
-from backend.stats_engine import get_current_streak, get_longest_streak, get_range_rate, get_range_status, get_week_range, get_month_range
+
+from backend.stats_engine import get_current_streak, get_longest_streak, get_range_rate, get_range_status, get_week_range, get_month_range, get_create_date
 
 class StatisticalChart(ft.Container):
     def __init__(self, habit_id, habit_name):
@@ -9,8 +10,8 @@ class StatisticalChart(ft.Container):
         self.habit_id = habit_id
         self.habit_name = habit_name
         self.cur_streak = get_current_streak(self.habit_id)
-        self.longest_streak = get_longest_streak(self.habit_id)
         self.today = datetime.datetime.now()
+        self.longest_streak = get_longest_streak(self.habit_id, get_create_date(self.habit_id), self.today.strftime("%Y-%m-%d"))
 
         # 建立一個「內容掛載點」，之後所有的內容都塞進這裡
         self.main_layout = ft.Column(scroll = ft.ScrollMode.ADAPTIVE,spacing = 20)
@@ -33,7 +34,7 @@ class StatisticalChart(ft.Container):
         completed = sum(1 for s in statuses if s is True)
         total = sum(1 for s in statuses if s is not None)
 
-        self.stats_row_area.controls = self.create_stat_card_controls(rate, completed, total)
+        self.stats_row_area.controls = self.create_stat_card_controls(rate, completed, total, 0)
 
 
     def validate_dates(self):
@@ -194,7 +195,7 @@ class StatisticalChart(ft.Container):
         ])
 
 
-    def create_stat_card_controls(self, rate, completed, total):
+    def create_stat_card_controls(self, rate, completed, total, longest_streak):
         def build_single_card(title, value):
             return ft.Container(
                 content = ft.Column([
@@ -210,7 +211,7 @@ class StatisticalChart(ft.Container):
         return [
             build_single_card("Overall Rate", f"{rate:.1%}"),
             build_single_card("Completed Days", f"{completed} / {total}"),
-            build_single_card("Longest Streak", f"{self.longest_streak} days"),
+            build_single_card("Longest Streak", f"{longest_streak} days"),
         ]
 
 
@@ -258,8 +259,10 @@ class StatisticalChart(ft.Container):
         completed = sum(1 for s in statuses if s is True)
         total = sum(1 for s in statuses if s is not None)
 
+        longest_streak = get_longest_streak(self.habit_id, start_date, end_date)
+
         # 更新卡片內容
-        new_cards = self.create_stat_card_controls(rate, completed, total)
+        new_cards = self.create_stat_card_controls(rate, completed, total, longest_streak)
         self.stats_row_area.controls = new_cards
         
         if self.page:
@@ -288,30 +291,3 @@ class StatisticalChart(ft.Container):
         ]
         
         self.stats_row_area.controls = initial_cards
-
-
-      
-
-    '''
-        # --- 4. Statistics Cards Row (Overall Rate, Complete Days, Longest Streak) ---
-        self.stat_cards = ft.Row(
-            spacing=20,
-            controls=[
-                self.create_stat_card("Overall Rate", "74 %"),
-                self.create_stat_card("Complete Days", "25 / 34"),
-                self.create_stat_card("Longest Streak", "12 days"),
-            ]
-        )
-
-        # --- 5. Chart Section ---
-        self.chart_title = ft.Text("Rate Over Time (Daily Completion Rate)", size=16)
-        
-        # 這裡使用簡單的 Placeholder，你可以之後填入 ft.LineChart
-        self.line_chart = ft.Container(
-            content=ft.Text("Line Chart Canvas Placeholder", color=ft.Colors.GREY_400),
-            height=300,
-            alignment=ft.Alignment.CENTER,
-            border=ft.border.all(1, ft.Colors.GREY_300),
-            border_radius=10
-        )     
-    '''
