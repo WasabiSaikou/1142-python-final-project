@@ -5,7 +5,6 @@ from backend.stats_engine import get_current_streak, get_longest_streak, get_ran
 
 class StatisticalChart(ft.Container):
     def __init__(self, habit_id, habit_name):
-        # super().__init__(expand = True, padding = 15)
         super().__init__(padding = 10, alignment = ft.Alignment.TOP_CENTER)
         self.habit_id = habit_id
         self.habit_name = habit_name
@@ -21,7 +20,7 @@ class StatisticalChart(ft.Container):
         # 建立自定義日期輸入 Row (預設不顯示)
         self.build_custom_date_row()
         self.build_ui_structure()
-        # 初始化
+        # initialize
         self.initial_load()
 
 
@@ -40,8 +39,10 @@ class StatisticalChart(ft.Container):
     def validate_dates(self):
         """驗證日期格式與合法性"""
         date_pattern = r"^\d{4}-\d{2}-\d{2}$"
+        MIN_DATE = datetime.datetime(2020, 1, 1)  # 假設 App 從 2020 開始
+        MAX_DATE = datetime.datetime.now().replace(hour = 0, minute = 0, second = 0, microsecond = 0)
         
-        def is_valid(date_str):
+        def get_date_obj(date_str):
             if not re.match(date_pattern, date_str):
                 return None
             try:
@@ -49,15 +50,18 @@ class StatisticalChart(ft.Container):
             except ValueError:
                 return None
 
-        from_date_obj = is_valid(self.from_input.value)
-        to_date_obj = is_valid(self.to_input.value)
-        
-        is_order_correct = False
+        from_date_obj = get_date_obj(self.from_input.value)
+        to_date_obj = get_date_obj(self.to_input.value)
+
+        is_valid = False
+
         if from_date_obj and to_date_obj:
             if from_date_obj <= to_date_obj:
-                is_order_correct = True
+                if (from_date_obj <= MAX_DATE) and (from_date_obj >= MIN_DATE):
+                    if (to_date_obj <= MAX_DATE) and (to_date_obj >= MIN_DATE):
+                        is_valid = True
         
-        self.apply_btn.disabled = not is_order_correct
+        self.apply_btn.disabled = not is_valid
         
         if self.page:
             self.update()
@@ -101,24 +105,23 @@ class StatisticalChart(ft.Container):
             style = ft.ButtonStyle(
                 shape = ft.RoundedRectangleBorder(radius = 5),
                 # 設定背景顏色：正常時為淡紅色 (Red 100/200)，禁用時為灰色
-                color={
+                color = {
                     ft.ControlState.DEFAULT: ft.Colors.RED_700,
                     ft.ControlState.DISABLED: ft.Colors.GREY_400,
                 },
-                bgcolor={
+                bgcolor = {
                     ft.ControlState.DEFAULT: ft.Colors.RED_100,
                     ft.ControlState.DISABLED: ft.Colors.GREY_200,
-                },
-            ),
-            
+                }
+            )            
         )
         
         # 包裝成一個 Row 並設定預設隱藏
         self.custom_date_area = ft.Row(
             controls = [
-                ft.Container(content=self.from_input_column, padding = ft.padding.only(left = 10, right = 10),expand = 1, alignment = ft.Alignment.CENTER),
-                ft.Container(content=self.to_input_column, padding = ft.padding.only(left = 10, right = 10), expand = 1, alignment = ft.Alignment.CENTER),
-                ft.Container(content=self.apply_btn, padding = ft.padding.only(top = 18, left = 10, right = 10), expand = 1, height = 55),
+                ft.Container(content = self.from_input_column, padding = ft.padding.only(left = 10, right = 10),expand = 1, alignment = ft.Alignment.CENTER),
+                ft.Container(content = self.to_input_column, padding = ft.padding.only(left = 10, right = 10), expand = 1, alignment = ft.Alignment.CENTER),
+                ft.Container(content = self.apply_btn, padding = ft.padding.only(top = 18, left = 10, right = 10), expand = 1, height = 55),
             ],
             alignment = ft.MainAxisAlignment.CENTER,
             vertical_alignment = ft.CrossAxisAlignment.CENTER,
@@ -129,32 +132,54 @@ class StatisticalChart(ft.Container):
     def build_ui_structure(self):
         # Header
         header_row = ft.Row(
-            controls = [
-                ft.Text(self.habit_name, size = 20, weight = "bold"),
-                ft.Text(f"{self.cur_streak}-day streak", size = 16, color = ft.Colors.GREY_700)
-            ],
-            alignment = ft.MainAxisAlignment.SPACE_BETWEEN,
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+            vertical_alignment=ft.CrossAxisAlignment.CENTER, # 確保垂直置中
+            controls=[
+                # habit name
+                ft.Container(
+                    content = ft.Row(
+                        controls = [
+                            ft.Text(
+                                self.habit_name, 
+                                size = 20, 
+                                weight = "bold",
+                                no_wrap = True
+                            )
+                        ],
+                        scroll=ft.ScrollMode.ADAPTIVE, 
+                    ),
+                    expand = True,
+                    margin = ft.margin.only(right = 15) 
+                ),
+                # streak
+                ft.Text(
+                    f"{self.cur_streak}-day streak", 
+                    size = 16, 
+                    color = ft.Colors.GREY_700,
+                    no_wrap = True
+                )
+            ]
         )
         header_container = ft.Container(
             content = header_row, 
             border = ft.border.only(bottom = ft.BorderSide(0.5, "black12")), 
-            padding = ft.padding.only(bottom = 5, left = 10, right = 10)
+            padding = ft.padding.only(bottom = 10, left = 10, right = 10) # 稍微增加 padding 讓比例更好看
         )
 
         # Segmented Buttons
         self.mode_buttons = ft.SegmentedButton(
-            selected = ["one week"],
+            selected = ["this week"],
             on_change = self.handle_mode_change,
             allow_empty_selection = False,
             allow_multiple_selection = False,
             show_selected_icon = False,
             expand = True,
             style = ft.ButtonStyle(
-                shape = ft.RoundedRectangleBorder(radius=5), # <--- 調整圓角大小 (0 為直角)
+                shape = ft.RoundedRectangleBorder(radius = 5),
             ),
             segments = [
-                ft.Segment(value = "one week", label = ft.Text("one week", text_align = ft.TextAlign.CENTER)),
-                ft.Segment(value = "one month", label = ft.Text("one month", text_align = ft.TextAlign.CENTER)),
+                ft.Segment(value = "this week", label = ft.Text("this week", text_align = ft.TextAlign.CENTER)),
+                ft.Segment(value = "this month", label = ft.Text("this month", text_align = ft.TextAlign.CENTER)),
                 ft.Segment(value = "Custom", label = ft.Text("Custom", text_align = ft.TextAlign.CENTER)),
             ],
         )
@@ -217,9 +242,9 @@ class StatisticalChart(ft.Container):
 
 
     def load_stats_by_mode(self, mode):
-        if mode == "one week":
+        if mode == "this week":
             date_range = get_week_range(self.today.strftime("%Y-%m-%d"))
-        else: # one month
+        else: # this month
             date_range = get_month_range(self.today.strftime("%Y-%m-%d"))
 
         self.render_stats(date_range["start"], date_range["end"])
@@ -246,13 +271,14 @@ class StatisticalChart(ft.Container):
         # 手動建立一組顯示為 0 的卡片
         def build_single(title, value):
             return ft.Container(
-                content=ft.Column([
-                    ft.Text(title, size=14, color=ft.Colors.GREY_700),
-                    ft.Text(value, size=24, weight="bold"),
-                ], alignment="center", horizontal_alignment="center"),
-                border=ft.border.all(1, ft.Colors.GREY_400),
-                border_radius=5,
-                expand=1,
+                content = ft.Column([
+                    ft.Text(title, size = 14, color = ft.Colors.GREY_700),
+                    ft.Text(value, size = 24, weight = "bold"),
+                ], alignment="center", horizontal_alignment = "center"),
+                border = ft.border.all(1, ft.Colors.GREY_400),
+                border_radius = 5,
+                expand = 1,
+                padding = ft.padding.only(top = 10, bottom = 10)
             )
             
         initial_cards = [

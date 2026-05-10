@@ -9,7 +9,7 @@ class DashboardView(ft.Container):
     def __init__(self):
         super().__init__(expand = True, padding = 0)
 
-        # 1. 初始資料與狀態
+        # Initial data and status
         self.habit_list = get_all_habits()
 
         # date information
@@ -21,7 +21,7 @@ class DashboardView(ft.Container):
             "day" :self.today.day
         }
         
-        # 2. 定義 dashboard 的 content
+        # dashboard content
         self.habit_items_column = ft.Column(
             expand = True,
             spacing = 10,
@@ -29,8 +29,13 @@ class DashboardView(ft.Container):
             horizontal_alignment = ft.CrossAxisAlignment.CENTER
         )
 
-        # 3. 建立彈出輸入框 (AlertDialog)
-        self.new_habit_name_tf = ft.TextField(label = "Habit Name", autofocus = True)
+        # Create a pop-up input box (AlertDialog)
+        self.new_habit_name_tf = ft.TextField(
+            label = "Habit Name", 
+            autofocus = True,
+            max_length = 100,
+        )
+
         self.add_habit_dialog = ft.AlertDialog(
             title = ft.Text("Add New Habit"),
             content = ft.Container(
@@ -54,7 +59,7 @@ class DashboardView(ft.Container):
             content_padding = ft.Padding.only(left = 20, right = 20, top = 20),
         )
         
-        # 4. 初始化佈局
+        # Initialize the layout
         self.build_dashboard()
 
 
@@ -82,7 +87,7 @@ class DashboardView(ft.Container):
                         ft.Text("Dashboard", size = 30, weight = "bold"),
                         ft.Text(f"{weekday_name}, {month_name} {day}, {year}", size = 15, color = "black54", weight = "bold")
                     ], spacing=5),
-                    # 改用 ElevatedButton 比較符合草圖按鈕樣式
+                    # New Habit Button
                     ft.Container(
                         content = ft.Row([
                             ft.Icon(ft.Icons.ADD, size = 20),
@@ -107,7 +112,7 @@ class DashboardView(ft.Container):
             expand = True
         )
 
-        # 組合
+        # combine
         self.content = ft.Column(
             expand = True,
             spacing = 0,
@@ -118,7 +123,7 @@ class DashboardView(ft.Container):
             ]
         )
 
-    # 建立習慣框框
+    # create a habit information box
     def create_habit_dashboard(self, habit_data):
         weekday = ["Mon.", "Tue.", "Wed.", "Thu.", "Fri.", "Sat.", "Sun."]
 
@@ -136,44 +141,64 @@ class DashboardView(ft.Container):
                 expand = True,
                 controls = [
                     ft.Row(
+                        alignment = ft.MainAxisAlignment.SPACE_BETWEEN,
+                        vertical_alignment = ft.CrossAxisAlignment.CENTER,
                         controls = [
-                            ft.Text(habit_name, size = 20, weight = "bold"),
+                            # habit name
+                            ft.Container(
+                                content = ft.Row(
+                                    controls = [
+                                        ft.Text(
+                                            habit_name, 
+                                            size = 20, 
+                                            weight = "bold", 
+                                            no_wrap = True
+                                        )
+                                    ],
+                                    scroll = ft.ScrollMode.ADAPTIVE,
+                                ),
+                                expand = True,
+                                margin = ft.margin.only(right = 10)
+                            ),
+                            # streak and delete button
                             ft.Row(
                                 controls = [
-                                    ft.Text(f"{current_streak}-day streak", color = "black54", weight = "bold"),
-                                    ft.IconButton(ft.Icons.DELETE, icon_color = "black54", 
-                                                    on_click = lambda e: self.handle_delete(habit_data))
+                                    ft.Text(f"{current_streak}-day streak", color = "black54", weight = "bold", no_wrap=True),
+                                    ft.IconButton(
+                                        ft.Icons.DELETE, 
+                                        icon_color = "black54", 
+                                        on_click = lambda e: self.handle_delete(habit_data)
+                                    )
                                 ],
                                 spacing = 10
                             )
-                        ],
-                        alignment = ft.MainAxisAlignment.SPACE_BETWEEN,
+                        ]
                     ),
                     ft.Row(
-                        controls=[
+                        controls = [
                             ft.Container(
-                                content=ft.ProgressBar(
-                                    value = self.get_progress(habit_id),    # 帶入你的進度數據 (0.0 ~ 1.0)
+                                content = ft.ProgressBar(
+                                    value = self.get_progress(habit_id),
                                     color = "#7BA753",
                                     bgcolor = "black12",
                                     height = 8,
                                     border_radius = 4
                                 ),
-                                expand=True, # 關鍵：讓進度條佔滿左邊剩餘的所有空間
+                                expand = True,
                             ),
-                            # 顯示百分比文字
+                            # Show percentage 
                             ft.Text(f"{int(self.get_progress(habit_id) * 100)} %", size = 16, weight = "bold", color = "black87")
                         ],
                         alignment = ft.MainAxisAlignment.CENTER,
                         vertical_alignment = ft.CrossAxisAlignment.CENTER,
-                        spacing = 25  # 進度條與百分比之間的間距
+                        spacing = 25
                     ),
                     ft.Row(
                         alignment = ft.MainAxisAlignment.SPACE_BETWEEN,
                         spacing = 10,
-                        controls=[
+                        controls = [
                             ft.Row(
-                                controls=[self.build_card(d, weekday[d], habit_id) for d in range(0, len(weekday))],
+                                controls = [self.build_card(d, weekday[d], habit_id) for d in range(0, len(weekday))],
                                 spacing = 10, 
                                 alignment = ft.MainAxisAlignment.START
                             ),
@@ -197,13 +222,10 @@ class DashboardView(ft.Container):
     def confirm_add_habit(self, e):
         new_name = self.new_habit_name_tf.value.strip()
         if new_name:
-            add_habit(new_name) # 1. 寫入資料庫
-            self.habit_list = get_all_habits() # 2. 重要：重新讀取最新的習慣列表資料
-            self.refresh_habit_list() # 3. 呼叫我們寫好的重新整理函式
-            self.close_dialog(e) # 4. 關閉視窗
-        '''add_habit(new_name)
-        print(self.habit_list)
-        self.close_dialog(e)'''
+            add_habit(new_name)
+            self.habit_list = get_all_habits()
+            self.refresh_habit_list()
+            self.close_dialog(e)
 
     def handle_delete(self, habit_data):
         self.habit_list.remove(habit_data)
@@ -216,8 +238,8 @@ class DashboardView(ft.Container):
 
     def build_card(self, index, day, habit_id):
         week_range = get_week_range(str(self.today.strftime("%Y-%m-%d")))  
-        weekly_status = get_range_status(habit_id, week_range["start"], week_range["end"])  # 取得本週狀態列表
-        status = weekly_status[index]  # 對應到當天的狀態
+        weekly_status = get_range_status(habit_id, week_range["start"], week_range["end"])
+        status = weekly_status[index]
 
         return ft.Container(
             content = ft.Text(day, size = 16),
@@ -233,13 +255,13 @@ class DashboardView(ft.Container):
         self.refresh_habit_list()
 
 
-    # --- 邏輯功能 ---
+    # logic function
     def refresh_habit_list(self):
         self.habit_list = get_all_habits()
         self.habit_items_column.controls.clear()
         
         if not self.habit_list:
-        # 如果為空，加入引導文字
+        # If empty, add guiding text.
             self.habit_items_column.controls.append(
                 ft.Container(
                     content = ft.Text(
@@ -260,7 +282,7 @@ class DashboardView(ft.Container):
             self.update()
 
 
-    # 當這個元件被掛載到 page 之後，Flet 會自動執行這裡
+    # 
     def did_mount(self):
         # 此時 self.page 已經存在，可以安全地執行重新整理
         self.refresh_habit_list()
