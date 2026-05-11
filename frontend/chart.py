@@ -13,7 +13,7 @@ class StatisticalChart(ft.Container):
         self.today = datetime.datetime.now()
         self.longest_streak = get_longest_streak(self.habit_id, get_create_date(self.habit_id), self.today.strftime("%Y-%m-%d"))
 
-        # 建立一個「內容掛載點」，之後所有的內容都塞進這裡
+        # Build a container to put all contents in
         self.main_layout = ft.Column(scroll = ft.ScrollMode.ADAPTIVE,spacing = 20)
         self.content = self.main_layout
         self.stats_row_area = ft.Row(spacing = 10, alignment = ft.MainAxisAlignment.CENTER)
@@ -36,15 +36,13 @@ class StatisticalChart(ft.Container):
             alignment = ft.Alignment.CENTER
         )
 
-        # 建立自定義日期輸入 Row (預設不顯示)
+        # Create a custom date input row (not displayed by default).
         self.build_custom_date_row()
         self.build_ui_structure()
-        # initialize
-        # self.initial_load()
-
 
 
     def initial_load(self):
+        # initialize interface
         date_range = get_week_range(self.today.strftime("%Y-%m-%d"))
         rate = get_range_rate(self.habit_id, date_range["start"], date_range["end"])
         statuses = get_range_status(self.habit_id, date_range["start"], date_range["end"])
@@ -61,9 +59,9 @@ class StatisticalChart(ft.Container):
 
 
     def validate_dates(self):
-        """驗證日期格式與合法性"""
+        # Verify date format and validity
         date_pattern = r"^\d{4}-\d{2}-\d{2}$"
-        MIN_DATE = datetime.datetime(2020, 1, 1)  # 假設 App 從 2020 開始
+        MIN_DATE = datetime.datetime(2020, 1, 1)  # Assuming the app starts in 2020
         MAX_DATE = datetime.datetime.now().replace(hour = 0, minute = 0, second = 0, microsecond = 0)
         
         def get_date_obj(date_str):
@@ -128,7 +126,7 @@ class StatisticalChart(ft.Container):
             expand = True,
             style = ft.ButtonStyle(
                 shape = ft.RoundedRectangleBorder(radius = 5),
-                # 設定背景顏色：正常時為淡紅色 (Red 100/200)，禁用時為灰色
+                # Background color setting
                 color = {
                     ft.ControlState.DEFAULT: ft.Colors.RED_700,
                     ft.ControlState.DISABLED: ft.Colors.GREY_400,
@@ -140,7 +138,7 @@ class StatisticalChart(ft.Container):
             )            
         )
         
-        # 包裝成一個 Row 並設定預設隱藏
+        # Package date information into a row
         self.custom_date_area = ft.Row(
             controls = [
                 ft.Container(content = self.from_input_column, padding = ft.padding.only(left = 10, right = 10),expand = 1, alignment = ft.Alignment.CENTER),
@@ -149,15 +147,16 @@ class StatisticalChart(ft.Container):
             ],
             alignment = ft.MainAxisAlignment.CENTER,
             vertical_alignment = ft.CrossAxisAlignment.CENTER,
-            visible = False # 初始隱藏
+            visible = False # Initial hiding
         )
         
 
+    # Interface structure
     def build_ui_structure(self):
         # Header
         header_row = ft.Row(
             alignment = ft.MainAxisAlignment.SPACE_BETWEEN,
-            vertical_alignment = ft.CrossAxisAlignment.CENTER, # 確保垂直置中
+            vertical_alignment = ft.CrossAxisAlignment.CENTER,
             controls = [
                 # habit name
                 ft.Container(
@@ -227,58 +226,53 @@ class StatisticalChart(ft.Container):
             self.chart_container.update()
             return
 
-        # 1. 日期邏輯處理
+        # Date logic processing
         start_date = datetime.datetime.strptime(start_date_str, "%Y-%m-%d")
         end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d")
         total_days = (end_date - start_date).days + 1
         
-        # 2. 計算 X 軸標籤間隔 (目標顯示 6~20 個標籤)
-        # 邏輯：根據總天數動態調整 step
+        # Calculate the X-axis label spacing -> Logic: dynamically adjust steps based on total number of days.
         if total_days <= 20:
-            step = 1  # 每天顯示
+            step = 1  # Show every day
         elif total_days <= 60:
-            step = 5  # 每 5 天
+            step = 5  # Show every 5 days
         elif total_days <= 120:
-            step = 10 # 每 10 天
+            step = 10 # Show every 10 days
         elif total_days <= 180:
-            step = 15 # 每 15 天
+            step = 15 # Show every 15 days
         else:
-            step = 30 # 約一個月
+            step = 30 # Show every 30 days
             
-        # 3. 建立 DataPoints 與 Axis Labels
         data_points = []
         x_axis_labels = []
             
         for i, val in enumerate(rates_list):
-            # 建立資料點
+            # Create data point
             data_points.append(fch.LineChartDataPoint(x = i, y = round(val * 100, 1)))
             
-            # 建立 X 軸標籤
+            # Create X-axis labels
             if i % step == 0 or i == len(rates_list) - 1:
                 current_date = start_date + datetime.timedelta(days = i)
                 year_label = current_date.strftime("%Y")
                 date_label = current_date.strftime("%m/%d")
-                # x-axis label
                 x_axis_labels.append(
                     fch.ChartAxisLabel(
                         value = i,
-                        label=ft.Container(
-                            content=ft.Column(
-                                controls=[
-                                    ft.Text(year_label, size=9, color="black38", weight="bold"),
-                                    ft.Text(date_label, size=10, color="black54", weight="bold"),
+                        label = ft.Container(
+                            content = ft.Column(
+                                controls = [
+                                    ft.Text(year_label, size = 9, color = "black38", weight = "bold"),
+                                    ft.Text(date_label, size = 10, color = "black54", weight = "bold"),
                                 ],
-                                spacing=2, # 年份與日期的間距
-                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                spacing = 2,
+                                horizontal_alignment = ft.CrossAxisAlignment.CENTER,
                             ),
-                            # 透過 padding.only(top=10) 讓日期文字與圖表下邊界產生間距
-                            padding=ft.padding.only(top=10) 
+                            padding = ft.padding.only(top = 10) 
                         )
-                        #label = ft.Text(date_label, size = 10, weight = "bold", color = "black54")
                     )
                 )
 
-        # 4. 建立圖表
+        # Build chart
         chart = fch.LineChart(
             data_series = [
                 fch.LineChartData(
@@ -291,7 +285,7 @@ class StatisticalChart(ft.Container):
                 )
             ],
             border = ft.border.all(1, ft.Colors.BLACK12),
-            # Y 軸設定
+            # y-axis setting
             left_axis = fch.ChartAxis(
                 label_spacing = 25,
                 labels = [
@@ -303,7 +297,7 @@ class StatisticalChart(ft.Container):
                 ],
                 label_size = 45,
             ),
-            # X 軸設定 (動態標籤)
+            # x-axis setting (dynamic label)
             bottom_axis = fch.ChartAxis(
                 labels = x_axis_labels,
                 label_size = 20,
@@ -345,7 +339,7 @@ class StatisticalChart(ft.Container):
     def handle_mode_change(self, e):
         mode = e.data if isinstance(e.data, str) else list(e.data)[0]
         
-        # 控制日期輸入框的顯示/隱藏
+        # Control the display/hide of the date input box
         self.custom_date_area.visible = (mode == "Custom")
 
         if mode != "Custom":
@@ -377,21 +371,19 @@ class StatisticalChart(ft.Container):
     def handle_apply_click(self, e):
         start_date = self.from_input.value
         end_date = self.to_input.value
-        # 這裡可以加一些格式檢查 (例如正則表達式)
         self.render_stats(start_date, end_date)
 
 
     def load_stats_by_mode(self, mode):
         if mode == "this week":
             date_range = get_week_range(self.today.strftime("%Y-%m-%d"))
-        else: # this month
+        else:     # this month
             date_range = get_month_range(self.today.strftime("%Y-%m-%d"))
 
         self.render_stats(date_range["start"], date_range["end"])
 
 
     def render_stats(self, start_date, end_date):
-        """最終執行數據獲取與渲染的函式"""
         rate = get_range_rate(self.habit_id, start_date, end_date)
         statuses = get_range_status(self.habit_id, start_date, end_date)
         
@@ -400,22 +392,21 @@ class StatisticalChart(ft.Container):
 
         longest_streak = get_longest_streak(self.habit_id, start_date, end_date)
 
-        # 更新卡片內容
+        # Update card content
         new_cards = self.create_stat_card_controls(rate, completed, total, longest_streak)
         self.stats_row_area.controls = new_cards
         
-        # 獲取累積數據並渲染圖表
+        # Get cumulative data and render a chart
         cumulative_rates = get_cumulative_rate(self.habit_id, start_date, end_date)
-        # 傳入起始與結束日期來計算 X 軸間隔
+        # calculate the x-axis interval
         self.update_line_chart(cumulative_rates, start_date, end_date)
         
         if self.page:
             self.update()
 
-    
+
+    # initial render    
     def render_custom_initial_stats(self):
-        """專門用於 Custom 模式初始化的渲染"""
-        # 手動建立一組顯示為 0 的卡片
         def build_single(title, value):
             return ft.Container(
                 content = ft.Column([

@@ -282,10 +282,7 @@ class DashboardView(ft.Container):
             self.update()
 
 
-    # 
     def did_mount(self):
-        # 此時 self.page 已經存在，可以安全地執行重新整理
         self.refresh_habit_list()
-        # 如果你之後需要用到對話框，確保它已經被關聯到 page 上
         self.page.dialog = self.add_habit_dialog 
         self.page.update()

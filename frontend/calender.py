@@ -1,7 +1,7 @@
 import flet as ft
 import calendar
 import datetime
-from backend.log_manager import get_status # 以 id、日期為參數，輸出該天的完成狀況
+from backend.log_manager import get_status
 from backend.stats_engine import get_month_range, get_range_status
 
 class HistoryCalendar(ft.Container):
@@ -15,14 +15,14 @@ class HistoryCalendar(ft.Container):
             "month": self.today.month,
         }
 
-        # 用來放置月曆格子的容器
+        # Container used to hold calendar pages
         self.calendar_content = ft.Column(
             spacing = 0, 
             horizontal_alignment = ft.CrossAxisAlignment.CENTER,
             width = 560
         )
 
-        # 建立一個支援水平滾動的 Row 來包住內容
+        # Create a row that supports horizontal scrolling to enclose the content.
         self.content = ft.Row(
             controls = [self.calendar_content],
             scroll = ft.ScrollMode.AUTO,
@@ -33,12 +33,13 @@ class HistoryCalendar(ft.Container):
         self.build_calendar()
         
 
-    def get_status_dot(self, date_str):     # 判斷日期狀態並回傳顏色
+    # Determine the date status and return the color
+    def get_status_dot(self, date_str):
         check_date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
         today_date = datetime.datetime.strptime(self.today.strftime("%Y-%m-%d"), "%Y-%m-%d")
-
+        # future dates: don't show dots
         if check_date > today_date:
-            return None         # future dates: don't show dots
+            return None
         
         status = get_range_status(self.habit_id, date_str, date_str)
         
@@ -60,7 +61,7 @@ class HistoryCalendar(ft.Container):
         month_list = calendar.monthcalendar(year, month)
 
         # title and navigation buttons
-        month_name = calendar.month_name[month] # 取得英文月份名稱
+        month_name = calendar.month_name[month]
         header_row = ft.Row(
             controls=[
                 ft.Row([
@@ -147,7 +148,7 @@ class HistoryCalendar(ft.Container):
         )
 
         # put grid_container into main Column
-        self.calendar_content.controls.append(grid_container) # 修正後的格線區
+        self.calendar_content.controls.append(grid_container)
         self.calendar_content.controls.append(ft.Container(height = 20))
         
         # legend

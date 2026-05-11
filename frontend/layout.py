@@ -24,7 +24,6 @@ class AppLayout(ft.Row):
         dashboard_item = self.nav_item(ft.Icon(ft.Icons.DASHBOARD, color = ft.Colors.BLACK), "Dashboard")
         statistics_item = self.nav_item(ft.Icon(ft.Icons.INSERT_CHART, color = ft.Colors.BLACK), "Statistics")
         history_item = self.nav_item(ft.Icon(ft.Icons.HISTORY, color = ft.Colors.BLACK), "History")
-        setting_item = self.nav_item(ft.Icon(ft.Icons.SETTINGS, color = ft.Colors.BLACK), "Setting")
 
         self.sidebar = ft.Container(
             width = 250,
@@ -48,11 +47,7 @@ class AppLayout(ft.Row):
                             spacing = 5,
                             controls = [dashboard_item, statistics_item, history_item]
                         )
-                    ),
-                    ft.Container(   # Setting button
-                        content = setting_item,
-                        padding = ft.padding.only(bottom = 20, top = 15, left = 10, right = 10),
-                    ),
+                    )
                 ]
             )
         )
@@ -113,8 +108,6 @@ class AppLayout(ft.Row):
             # self.content_area.content = ft.Text("Statistics", size=30)
         elif clicked_label == "History":
             self.content_area.content = HistoryView()
-        elif clicked_label == "Setting":
-            self.content_area.content = ft.Text("Settings", size=30)
 
         # update content
         self.content_area.update()

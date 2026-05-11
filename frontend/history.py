@@ -7,10 +7,8 @@ class HistoryView(ft.Container):
         super().__init__(expand = True, padding = 0)
         
         # save all visited Container
-        self.hist_items_list = []
-        
+        self.hist_items_list = []        
         self.habit_list = get_all_habits()
-        # return [{"id": "abc", "name": "Running", "created_at": "2026-04-28"}, {"id": "efg", "name": "Reading", "created_at": "2026-04-30"}]
         
         # right side : detail of history
         self.hist_detail = ft.Container(
@@ -20,16 +18,16 @@ class HistoryView(ft.Container):
             alignment = ft.Alignment.TOP_CENTER
         )       
         
-        # 沒有習慣資料時顯示提示
+        # A prompt when there is no custom data
         if not self.habit_list:
             self.hist_detail.content = ft.Text("No habits were established.", size = 20, color = "grey")
         else:
-            # 建立 Sidebar 項目，傳入整個習慣字典
+            # Build sidebar projects
             sidebar_controls = [self.hist_nav_item(habit) for habit in self.habit_list]
-            # 初始化：預設顯示第一個習慣的日曆
+            # Initialization the calendar
             first_habit = self.habit_list[0]
             self.hist_detail.content = self.create_detail_content(first_habit["id"])
-            sidebar_controls[0].bgcolor = "black12" # 設定第一個為選取狀態      
+            sidebar_controls[0].bgcolor = "black12" # Set the first one as the selected state    
 
         # left side : sidebar of hostory
         self.hist_sidebar = ft.Container(
@@ -92,7 +90,7 @@ class HistoryView(ft.Container):
 
 
     def create_detail_content(self, habit_id):
-        """傳入 ID 建立日曆元件"""
+        # send ID to build calendar elements
         return ft.Column(
             controls = [HistoryCalendar(habit_id = habit_id)], 
             scroll = ft.ScrollMode.AUTO, 
@@ -101,9 +99,7 @@ class HistoryView(ft.Container):
 
 
     def hist_nav_item(self, habit_dict):
-        """產生成員條目，將字典存入 data"""
-
-        # 內建 hover 處理 (懸浮變色)
+        # Generate member entries
         def handle_hover(e):
             if e.control.bgcolor != "black12":
                 e.control.bgcolor = "black12" if e.data == "true" else None
@@ -112,8 +108,8 @@ class HistoryView(ft.Container):
         nav_item = ft.Container(
             on_click = self.hist_on_nav_change,
             on_hover = handle_hover,
-            data = habit_dict,  # 這裡存入整個字典 {"id": ..., "name": ...}
-            padding = ft.padding.symmetric(horizontal = 10, vertical = 12), # 增加上下間距
+            data = habit_dict,
+            padding = ft.padding.symmetric(horizontal = 10, vertical = 12),
             border_radius = 5,
             ink = True,
             ink_color = "black12",
@@ -122,45 +118,32 @@ class HistoryView(ft.Container):
                 vertical_alignment = ft.CrossAxisAlignment.START,
                 controls = [
                     ft.Icon(ft.Icons.EVENT, size = 20, color = "#807E7C"),
-                    # 使用 Expanded 強制文字佔滿剩餘寬度並觸發換行
                     ft.Text(
-                        value = habit_dict["name"], # 顯示習慣名稱
+                        value = habit_dict["name"],
                         size = 16,
                         color = "black87",
-                        overflow = ft.TextOverflow.VISIBLE, # 確保換行文字不會被截斷
+                        overflow = ft.TextOverflow.VISIBLE, # Ensure that line breaks are not truncated
                         no_wrap = False,
                         expand = True
                     )    
                 ]
             )
         )
-        # 將物件存入清單，供後續遍歷更新
+        # Store the items in a list for later iteration and updates
         self.hist_items_list.append(nav_item)
         return nav_item
 
 
     def hist_on_nav_change(self, e):
-        # 獲取點擊的習慣字典
+        # Get click habit dictionary
         habit_info = e.control.data
         clicked_id = habit_info["id"]
 
-        # 1. 更新側邊欄背景色
+        # Update sidebar background color
         for item in self.hist_items_list:
             item.bgcolor = "black12" if item.data["id"] == clicked_id else None
             item.update()
 
-        # 2. 以 ID 為參數更新右側日曆
+        # Update the calendar on the right
         self.hist_detail.content = self.create_detail_content(clicked_id)
         self.hist_detail.update()
-
-        '''
-        # 1. 遍歷清單，更新所有條目的背景色
-        for item in self.hist_items_list:
-            item.bgcolor = "black12" if item.data == clicked_label else None
-            item.update()
-
-        # 2. **核心銜接點**：更換右側 Detail 內容
-        # 我們直接重新建立整個 Column，並傳入新的 habit_info 給 HistoryCalendar
-        self.hist_detail.content = self.create_detail_content(clicked_label)
-        self.hist_detail.update()
-        '''

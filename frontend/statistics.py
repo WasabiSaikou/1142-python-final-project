@@ -10,7 +10,6 @@ class StatisticView(ft.Container):
         self.stat_items_list = []
 
         self.habit_list = get_all_habits()
-        # return [{"id": "abc", "name": "Running", "created_at": "2026-04-28"}, {"id": "efg", "name": "Reading", "created_at": "2026-04-30"}]
 
         # right side : detail of statistics
         self.stat_detail = ft.Container(
@@ -20,16 +19,16 @@ class StatisticView(ft.Container):
             alignment = ft.Alignment.TOP_CENTER
         )
 
-        # 沒有習慣資料時顯示提示
+        # A prompt when there is no custom data
         if not self.habit_list:
             self.stat_detail.content = ft.Text("No habits were established.", size = 20, color = "grey")
         else:
-            # 建立 Sidebar 項目，傳入整個習慣字典
+            # Build sidebar projects
             sidebar_controls = [self.stat_nav_item(habit) for habit in self.habit_list]
-            # 初始化：預設顯示第一個習慣的日曆
+            # Initialization the calendar
             first_habit = self.habit_list[0]
             self.stat_detail.content = self.create_detail_content(first_habit["id"], first_habit["name"])
-            sidebar_controls[0].bgcolor = "black12" # 設定第一個為選取狀態      
+            sidebar_controls[0].bgcolor = "black12" # Set the first one as the selected state      
 
         # left side : sidebar of statistics
         self.stat_sidebar = ft.Container(
@@ -37,7 +36,7 @@ class StatisticView(ft.Container):
             alignment = ft.Alignment.TOP_LEFT,
             padding = 0,
             bgcolor = "#F5EFE6",
-            border = ft.border.only(right = ft.BorderSide(0.5, "black12")), # 右側線條邊框
+            border = ft.border.only(right = ft.BorderSide(0.5, "black12")),
             content = ft.Column(
                 spacing = 0,
                 controls = [
@@ -90,7 +89,7 @@ class StatisticView(ft.Container):
         )
 
     def create_detail_content(self, habit_id, habit_name):
-        """封裝右側內容的生成邏輯"""
+        # send ID to build calendar elements
         return ft.Column(
             controls = [StatisticalChart(habit_id = habit_id, habit_name = habit_name)], 
             scroll = ft.ScrollMode.AUTO, 
@@ -99,9 +98,7 @@ class StatisticView(ft.Container):
 
 
     def stat_nav_item(self, habit_dict):
-        """產生成員條目，將字典存入 data"""
-
-        # 內建 hover 處理 (懸浮變色)
+        # Generate member entries
         def handle_hover(e):
             if e.control.bgcolor != "black12":
                 e.control.bgcolor = "black12" if e.data == "true" else None
@@ -120,34 +117,33 @@ class StatisticView(ft.Container):
                 vertical_alignment = ft.CrossAxisAlignment.START,
                 controls = [
                     ft.Icon(ft.Icons.EVENT, size = 20, color = "#807E7C"),
-                    # 使用 Expanded 強制文字佔滿剩餘寬度並觸發換行
                     ft.Text(
-                        value = habit_dict["name"], # 顯示習慣名稱
+                        value = habit_dict["name"],
                         size = 16,
                         color = "black87",
-                        overflow = ft.TextOverflow.VISIBLE, # 確保換行文字不會被截斷
+                        overflow = ft.TextOverflow.VISIBLE, # Ensure that line breaks are not truncated
                         no_wrap = False,
                         expand = True
                     )    
                 ]
             )
         )
-        # 將物件存入清單，供後續遍歷更新
+        # Store the items in a list for later iteration and updates
         self.stat_items_list.append(nav_item)
         return nav_item
     
 
     def stat_on_nav_change(self, e):
-        # 獲取點擊的習慣字典
+        # Get click habit dictionary
         habit_info = e.control.data
         clicked_id = habit_info["id"]
         click_name = habit_info["name"]
 
-        # 1. 更新側邊欄背景色
+        # Update sidebar background color
         for item in self.stat_items_list:
             item.bgcolor = "black12" if item.data["id"] == clicked_id else None
             item.update()
 
-        # 2. 以 ID 為參數更新右側日曆
+        # Update the calendar on the right
         self.stat_detail.content = self.create_detail_content(clicked_id, click_name)
         self.stat_detail.update()
