@@ -20,30 +20,7 @@ def main(page: ft.Page):
         "CustomQuicksand": "/fonts/Quicksand-VariableFont_wght.ttf" # 路徑相對於 assets
     }
     page.theme = ft.Theme(font_family = "CustomQuicksand")
-    # Fix: Material 3 defaults to a grayish on_surface color for all ft.Text() widgets.
-    # Setting a warm color_scheme_seed (matching the app's beige palette) and overriding
-    # the text_theme ensures all unstyled ft.Text() renders in black instead of gray.
-    """page.theme = ft.Theme(
-        font_family = "CustomQuicksand",
-        color_scheme_seed = "#7D673F",  # warm brown matching the title bar — generates a warm M3 palette
-        text_theme = ft.TextTheme(
-            body_medium = ft.TextStyle(color = ft.Colors.BLACK),   # default style for ft.Text()
-            body_large = ft.TextStyle(color = ft.Colors.BLACK),    # used by ListTile titles
-            body_small = ft.TextStyle(color = ft.Colors.BLACK),
-            title_large = ft.TextStyle(color = ft.Colors.BLACK),
-            title_medium = ft.TextStyle(color = ft.Colors.BLACK),
-            title_small = ft.TextStyle(color = ft.Colors.BLACK),
-            label_large = ft.TextStyle(color = ft.Colors.BLACK),
-            label_medium = ft.TextStyle(color = ft.Colors.BLACK),
-            label_small = ft.TextStyle(color = ft.Colors.BLACK),
-            headline_large=ft.TextStyle(color = ft.Colors.BLACK),
-            headline_medium = ft.TextStyle(color = ft.Colors.BLACK),
-            headline_small = ft.TextStyle(color = ft.Colors.BLACK),
-            display_large = ft.TextStyle(color = ft.Colors.BLACK),
-            display_medium = ft.TextStyle(color = ft.Colors.BLACK),
-            display_small = ft.TextStyle(color = ft.Colors.BLACK),
-        )
-    )"""
+    
     # create layout instance
     app_layout = AppLayout(page)
     
