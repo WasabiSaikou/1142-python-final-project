@@ -195,17 +195,18 @@ python main.py
 
 ## Authors and Acknowledgment
 
-- **Authors:** Mason Yu, 
+- **Authors:** Wei-Li Yu, Yu-Xuan Wu, Yu-Ning Peng 
 - **Course:** 1142 Python — Final Project
 - **Built with:** [Flet](https://flet.dev/), [Quicksand font](https://fonts.google.com/specimen/Quicksand)
 
 ## Support / Contact
 
-For any inquires, please contact me at masonyu463@gmail.com
+For any inquiries, please contact me at masonyu463@gmail.com.
 
 ## License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
 ## Project Status
 
 In active development as a course final project.
