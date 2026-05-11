@@ -1,8 +1,8 @@
 import flet as ft
 import datetime
 import re
-
-from backend.stats_engine import get_current_streak, get_longest_streak, get_range_rate, get_range_status, get_week_range, get_month_range, get_create_date
+import flet_charts as fch
+from backend.stats_engine import get_current_streak, get_longest_streak, get_range_rate, get_range_status, get_week_range, get_month_range, get_create_date, get_cumulative_rate
 
 class StatisticalChart(ft.Container):
     def __init__(self, habit_id, habit_name):
@@ -18,11 +18,29 @@ class StatisticalChart(ft.Container):
         self.content = self.main_layout
         self.stats_row_area = ft.Row(spacing = 10, alignment = ft.MainAxisAlignment.CENTER)
 
+        # Line Chart Area
+        self.chart_container = ft.Container(
+            content = ft.Column(
+                controls = [
+                    ft.Text("Input a range to view progress chart", size = 16, weight = "bold", color = "black45"),
+                    ft.Text("The scope is limited to 2020 to today.", size = 13, color = "black45")
+                ],
+                alignment = ft.MainAxisAlignment.CENTER,
+                horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+                spacing = 5
+            ),
+            height = 300,
+            padding = None,
+            border = ft.border.all(1, ft.Colors.GREY_300),
+            border_radius = 10,
+            alignment = ft.Alignment.CENTER
+        )
+
         # 建立自定義日期輸入 Row (預設不顯示)
         self.build_custom_date_row()
         self.build_ui_structure()
         # initialize
-        self.initial_load()
+        # self.initial_load()
 
 
 
@@ -35,6 +53,11 @@ class StatisticalChart(ft.Container):
         total = sum(1 for s in statuses if s is not None)
 
         self.stats_row_area.controls = self.create_stat_card_controls(rate, completed, total, self.cur_streak)
+        
+        cumulative_rates = get_cumulative_rate(self.habit_id, date_range["start"], date_range["end"])
+        self.update_line_chart(cumulative_rates, date_range["start"], date_range["end"])
+
+        self.render_stats(date_range["start"], date_range["end"])
 
 
     def validate_dates(self):
@@ -133,9 +156,9 @@ class StatisticalChart(ft.Container):
     def build_ui_structure(self):
         # Header
         header_row = ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER, # 確保垂直置中
-            controls=[
+            alignment = ft.MainAxisAlignment.SPACE_BETWEEN,
+            vertical_alignment = ft.CrossAxisAlignment.CENTER, # 確保垂直置中
+            controls = [
                 # habit name
                 ft.Container(
                     content = ft.Row(
@@ -147,7 +170,7 @@ class StatisticalChart(ft.Container):
                                 no_wrap = True
                             )
                         ],
-                        scroll=ft.ScrollMode.ADAPTIVE, 
+                        scroll = ft.ScrollMode.ADAPTIVE, 
                     ),
                     expand = True,
                     margin = ft.margin.only(right = 15) 
@@ -164,7 +187,7 @@ class StatisticalChart(ft.Container):
         header_container = ft.Container(
             content = header_row, 
             border = ft.border.only(bottom = ft.BorderSide(0.5, "black12")), 
-            padding = ft.padding.only(bottom = 10, left = 10, right = 10) # 稍微增加 padding 讓比例更好看
+            padding = ft.padding.only(bottom = 10, left = 10, right = 10) 
         )
 
         # Segmented Buttons
@@ -190,9 +213,113 @@ class StatisticalChart(ft.Container):
         self.main_layout.controls.extend([
             header_container,
             buttons_row,
-            self.custom_date_area,  # 自訂日期輸入區
-            self.stats_row_area     # 將統計卡片的坑位放在按鈕下方
+            self.custom_date_area,
+            self.stats_row_area,
+            ft.Text("Rate Over Time (Daily Completion Rate)", size = 16, weight = "bold"),
+            self.chart_container
         ])
+
+
+    def update_line_chart(self, rates_list, start_date_str, end_date_str):
+        if not rates_list:
+            self.chart_container.content = ft.Text("No data found for the selected range.", color = "black45")
+            self.chart_container.border = ft.border.all(1, ft.Colors.GREY_300)
+            self.chart_container.update()
+            return
+
+        # 1. 日期邏輯處理
+        start_date = datetime.datetime.strptime(start_date_str, "%Y-%m-%d")
+        end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d")
+        total_days = (end_date - start_date).days + 1
+        
+        # 2. 計算 X 軸標籤間隔 (目標顯示 6~20 個標籤)
+        # 邏輯：根據總天數動態調整 step
+        if total_days <= 20:
+            step = 1  # 每天顯示
+        elif total_days <= 60:
+            step = 5  # 每 5 天
+        elif total_days <= 120:
+            step = 10 # 每 10 天
+        elif total_days <= 180:
+            step = 15 # 每 15 天
+        else:
+            step = 30 # 約一個月
+            
+        # 3. 建立 DataPoints 與 Axis Labels
+        data_points = []
+        x_axis_labels = []
+            
+        for i, val in enumerate(rates_list):
+            # 建立資料點
+            data_points.append(fch.LineChartDataPoint(x = i, y = round(val * 100, 1)))
+            
+            # 建立 X 軸標籤
+            if i % step == 0 or i == len(rates_list) - 1:
+                current_date = start_date + datetime.timedelta(days = i)
+                year_label = current_date.strftime("%Y")
+                date_label = current_date.strftime("%m/%d")
+                # x-axis label
+                x_axis_labels.append(
+                    fch.ChartAxisLabel(
+                        value = i,
+                        label=ft.Container(
+                            content=ft.Column(
+                                controls=[
+                                    ft.Text(year_label, size=9, color="black38", weight="bold"),
+                                    ft.Text(date_label, size=10, color="black54", weight="bold"),
+                                ],
+                                spacing=2, # 年份與日期的間距
+                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                            ),
+                            # 透過 padding.only(top=10) 讓日期文字與圖表下邊界產生間距
+                            padding=ft.padding.only(top=10) 
+                        )
+                        #label = ft.Text(date_label, size = 10, weight = "bold", color = "black54")
+                    )
+                )
+
+        # 4. 建立圖表
+        chart = fch.LineChart(
+            data_series = [
+                fch.LineChartData(
+                    points = data_points,
+                    stroke_width = 3,
+                    color = ft.Colors.RED_400,
+                    below_line_bgcolor = ft.Colors.with_opacity(0.1, ft.Colors.RED_400),
+                    selected_below_line = True,
+                    rounded_stroke_cap = True
+                )
+            ],
+            border = ft.border.all(1, ft.Colors.BLACK12),
+            # Y 軸設定
+            left_axis = fch.ChartAxis(
+                label_spacing = 25,
+                labels = [
+                    fch.ChartAxisLabel(value = 0, label = ft.Text("0.0%", size = 11)),
+                    fch.ChartAxisLabel(value = 25, label = ft.Text("25.0%", size = 11)),
+                    fch.ChartAxisLabel(value = 50, label = ft.Text("50.0%", size = 11)),
+                    fch.ChartAxisLabel(value = 75, label = ft.Text("75.0%", size = 11)),
+                    fch.ChartAxisLabel(value = 100, label = ft.Text("100.0%", size = 11)),
+                ],
+                label_size = 45,
+            ),
+            # X 軸設定 (動態標籤)
+            bottom_axis = fch.ChartAxis(
+                labels = x_axis_labels,
+                label_size = 20,
+            ),
+            horizontal_grid_lines = fch.ChartGridLines(interval = 25, color = ft.Colors.GREY_300, width = 1),
+            min_y = 0,
+            max_y = 100,
+            expand = True
+        )
+
+        self.chart_container.padding = ft.padding.only(left = 0, right = 20, top = 50, bottom = 20)
+        self.chart_container.border = None
+        self.chart_container.content = chart
+        
+        if self.page:
+            self.chart_container.update()
 
 
     def create_stat_card_controls(self, rate, completed, total, longest_streak):
@@ -226,11 +353,23 @@ class StatisticalChart(ft.Container):
         else:
             self.from_input.value = ""
             self.to_input.value = ""
-            
             self.apply_btn.disabled = True
-            
+
             self.render_custom_initial_stats()
-            
+
+            self.chart_container.content = ft.Column(
+                controls = [
+                    ft.Text("Input a range to view progress chart", color = "black45", size = 16, weight = "bold"),
+                    ft.Text("The scope is limited to 2020 to today.", color = "black38", size = 13),
+                ],
+                alignment = ft.MainAxisAlignment.CENTER,
+                horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+                spacing = 5
+            )
+            self.chart_container.border = ft.border.all(1, ft.Colors.GREY_300)
+            self.chart_container.alignment = ft.Alignment.CENTER
+            self.chart_container.padding = None
+
             if self.page:
                 self.update()
 
@@ -265,6 +404,11 @@ class StatisticalChart(ft.Container):
         new_cards = self.create_stat_card_controls(rate, completed, total, longest_streak)
         self.stats_row_area.controls = new_cards
         
+        # 獲取累積數據並渲染圖表
+        cumulative_rates = get_cumulative_rate(self.habit_id, start_date, end_date)
+        # 傳入起始與結束日期來計算 X 軸間隔
+        self.update_line_chart(cumulative_rates, start_date, end_date)
+        
         if self.page:
             self.update()
 
@@ -291,3 +435,7 @@ class StatisticalChart(ft.Container):
         ]
         
         self.stats_row_area.controls = initial_cards
+
+    
+    def did_mount(self):
+        self.initial_load()
