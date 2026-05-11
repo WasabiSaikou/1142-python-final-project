@@ -1,6 +1,6 @@
 import flet as ft
 from backend.habit_manager import get_all_habits
-from frontend.calender import HistoryCalendar
+from frontend.calendar import HistoryCalendar
 
 class HistoryView(ft.Container):
     def __init__(self):
@@ -10,81 +10,92 @@ class HistoryView(ft.Container):
         self.hist_items_list = []        
         self.habit_list = get_all_habits()
         
-        # right side : detail of history
-        self.hist_detail = ft.Container(
-            padding = 15,
-            expand = True,
-            content = ft.Text("Select a habit to see details", size = 20, color = "grey"),
-            alignment = ft.Alignment.TOP_CENTER
-        )       
+        # Header
+        self.header = ft.Container(
+            width = 1400,
+            bgcolor = "#F6EFE5",
+            padding = ft.padding.only(left = 25, top = 20, bottom = 20),
+            border = ft.border.only(bottom = ft.BorderSide(0.5, "black12")),
+            content = ft.Column([
+                ft.Text("History", size = 30, weight = "bold", color = ft.Colors.BLACK),
+                ft.Text("Review your daily progress.", size = 15, weight = "bold", color = "black54"),
+            ], spacing = 5)
+        )      
         
         # A prompt when there is no custom data
         if not self.habit_list:
-            self.hist_detail.content = ft.Text("No habits were established.", size = 20, color = "grey")
+            self.main_display = ft.Container(
+                expand = True,
+                content = ft.Text(
+                    "No habits were established.", 
+                    size = 20, 
+                    color = "black45",
+                    weight = "w500"
+                ),
+                alignment = ft.Alignment.TOP_CENTER,
+                padding = ft.padding.only(top = 25)
+            )
         else:
+            # right side : detail of history
+            self.hist_detail = ft.Container(
+                padding = 15,
+                expand = True,
+                content = ft.Text("Select a habit to see details", size = 20, color = "grey"),
+                alignment = ft.Alignment.TOP_CENTER
+            ) 
+
             # Build sidebar projects
             sidebar_controls = [self.hist_nav_item(habit) for habit in self.habit_list]
             # Initialization the calendar
             first_habit = self.habit_list[0]
             self.hist_detail.content = self.create_detail_content(first_habit["id"])
-            sidebar_controls[0].bgcolor = "black12" # Set the first one as the selected state    
+            sidebar_controls[0].bgcolor = "black12" # Set the first one as the selected state
 
-        # left side : sidebar of hostory
-        self.hist_sidebar = ft.Container(
-            width = 250,
-            alignment = ft.Alignment.TOP_LEFT,
-            padding = 0,
-            bgcolor = "#F5EFE6",
-            border = ft.border.only(right = ft.BorderSide(0.5, "black12")),
-            content = ft.Column(
+            # left side : sidebar of hostory
+            self.hist_sidebar = ft.Container(
+                width = 250,
+                alignment = ft.Alignment.TOP_LEFT,
+                bgcolor = "#F5EFE6",
+                border = ft.border.only(right = ft.BorderSide(0.5, "black12")),
+                content = ft.Column(
+                    spacing = 0,
+                    controls = [
+                        # SELECT HABIT
+                        ft.Container(                        
+                            content = ft.Text("SELECT HABIT", size = 13, weight = "bold", color = "#807E7C"),
+                            padding = ft.padding.only(top = 20, bottom = 10, left = 10)
+                        ),
+                        ft.Container(
+                            expand = True,
+                            padding = ft.padding.only(left=5, right=5),
+                            content = ft.Column(
+                                controls = sidebar_controls,
+                                scroll = ft.ScrollMode.AUTO,
+                                spacing = 5
+                            )
+                        ) 
+                    ]
+                )
+            )
+
+            # all contents of History
+            self.main_display = ft.Row(
+                expand = True,
                 spacing = 0,
+                vertical_alignment = ft.CrossAxisAlignment.START,
                 controls = [
-                    # SELECT HABIT
-                    ft.Container(                        
-                        content = ft.Text("SELECT HABIT", size = 13, weight = "bold", color = "#807E7C"),
-                        padding = ft.padding.only(top = 20, bottom = 10, left = 10)
-                    ),
-                    ft.Container(
-                        expand = True,
-                        padding = ft.padding.only(left = 5, right = 5),
-                        content = ft.Column(
-                            # controls = [self.hist_nav_item(name) for name in habit_info],
-                            controls = sidebar_controls,
-                            scroll = ft.ScrollMode.AUTO,
-                            spacing = 5
-                        )
-                    ) 
+                    self.hist_sidebar,
+                    self.hist_detail
                 ]
             )
-        )
 
         # all contents of History
         self.content = ft.Column(
             expand = True,
             spacing = 0,
-            controls=[
-                # Title : History
-                ft.Container(
-                    width = 1400,
-                    bgcolor = "#F6EFE5",
-                    padding = ft.padding.only(left = 25, top = 20, bottom = 20),
-                    border = ft.border.only(bottom = ft.BorderSide(0.5, "black12")),
-                    content = ft.Column([
-                        ft.Text("History", size = 30, weight = "bold"),
-                        ft.Text("Review your daily progress.", size = 15),
-                    ], spacing = 5)
-                ),
-
-                # Content (left -> sidebar ; right -> history of the chosen habit)
-                ft.Row(
-                    expand = True,
-                    spacing = 0,
-                    vertical_alignment = ft.CrossAxisAlignment.START,
-                    controls = [
-                        self.hist_sidebar,
-                        self.hist_detail
-                    ]
-                )
+            controls = [
+                self.header,
+                self.main_display
             ]
         )
 

@@ -68,7 +68,7 @@ class HistoryCalendar(ft.Container):
                     ft.IconButton(ft.Icons.KEYBOARD_DOUBLE_ARROW_LEFT, on_click = lambda _: self.change_date(y = -1)),
                     ft.IconButton(ft.Icons.KEYBOARD_ARROW_LEFT, on_click = lambda _: self.change_date(m = -1)),
                 ], spacing = 0),
-                ft.Text(f"{month_name} {year}", size = 30, weight = "bold", width = 250, text_align = "center", expand = True),
+                ft.Text(f"{month_name} {year}", size = 30, color = ft.Colors.BLACK, weight = "bold", width = 250, text_align = "center", expand = True),
                 ft.Row([
                     ft.IconButton(ft.Icons.KEYBOARD_ARROW_RIGHT, on_click = lambda _: self.change_date(m = 1)),
                     ft.IconButton(ft.Icons.KEYBOARD_DOUBLE_ARROW_RIGHT, on_click = lambda _: self.change_date(y = 1)),
@@ -88,7 +88,7 @@ class HistoryCalendar(ft.Container):
         week_head = ft.Row(
             controls=[
                 ft.Container(
-                    content = ft.Text(day, size = 16, weight = "bold"),
+                    content = ft.Text(day, size = 16, weight = "bold", color = ft.Colors.BLACK),
                     width = 80, height = 40, alignment = ft.Alignment.CENTER,
                     border = ft.border.only(
                         bottom = ft.BorderSide(0.5, ft.Colors.BLACK26),
@@ -106,7 +106,7 @@ class HistoryCalendar(ft.Container):
             for day in range(0, len(month_list[week])):
                 # basic cell with date number and status dot
                 content_stack = ft.Column(
-                    controls=[ft.Text(str(month_list[week][day]) if month_list[week][day] != 0 else "", size=16)],
+                    controls=[ft.Text(str(month_list[week][day]) if month_list[week][day] != 0 else "", size=16, color = ft.Colors.BLACK)],
                     alignment = ft.MainAxisAlignment.START,
                     horizontal_alignment = ft.CrossAxisAlignment.CENTER,
                     spacing = 8
@@ -155,11 +155,11 @@ class HistoryCalendar(ft.Container):
         legend_row = ft.Row(
             controls = [
                 ft.Row([ft.Container(width = 14, height = 14, border_radius = 7, bgcolor = "#58CD67"),
-                        ft.Text(" : completed", size = 18)], alignment = ft.Alignment.TOP_LEFT),
+                        ft.Text(" : completed", size = 18, color = ft.Colors.BLACK)], alignment = ft.Alignment.TOP_LEFT),
                 ft.Row([ft.Container(width = 14, height = 14, border_radius = 7, bgcolor = "#F92828"),
-                        ft.Text(" : missed", size = 18)], alignment = ft.Alignment.TOP_LEFT),
+                        ft.Text(" : missed", size = 18, color = ft.Colors.BLACK)], alignment = ft.Alignment.TOP_LEFT),
                 ft.Row([ft.Container(width = 14, height = 14, border_radius = 7, bgcolor = "#888888"),
-                        ft.Text(" : not started", size = 18)], alignment = ft.Alignment.TOP_LEFT)
+                        ft.Text(" : not started", size = 18, color = ft.Colors.BLACK)], alignment = ft.Alignment.TOP_LEFT)
             ],
             alignment = ft.MainAxisAlignment.CENTER,
             spacing = 90,

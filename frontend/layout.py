@@ -34,7 +34,7 @@ class AppLayout(ft.Row):
                 spacing = 0,
                 controls = [
                     ft.Container(   # Title : MENU
-                        content = ft.Text("MENU", size = 40, weight = "bold"),
+                        content = ft.Text("MENU", size = 40, weight = "bold", color = ft.Colors.BLACK),
                         padding = ft.padding.only(top = 30, bottom = 30, left = 40)
                     ),
                     ft.Container(   # Intermediate function list
@@ -105,7 +105,6 @@ class AppLayout(ft.Row):
             self.content_area.content = DashboardView()
         elif clicked_label == "Statistics":
             self.content_area.content = StatisticView()
-            # self.content_area.content = ft.Text("Statistics", size=30)
         elif clicked_label == "History":
             self.content_area.content = HistoryView()
 

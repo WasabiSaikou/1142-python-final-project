@@ -37,7 +37,7 @@ class DashboardView(ft.Container):
         )
 
         self.add_habit_dialog = ft.AlertDialog(
-            title = ft.Text("Add New Habit"),
+            title = ft.Text("Add New Habit", color = ft.Colors.BLACK),
             content = ft.Container(
                 expand = True,
                 padding = ft.padding.only(left = 10, right = 10),
@@ -45,7 +45,7 @@ class DashboardView(ft.Container):
                 height = 200,
                 content = ft.Column(
                     controls = [
-                        ft.Text("Please enter your new habit name in the input box below."),
+                        ft.Text("Please enter your new habit name in the input box below.", color = ft.Colors.BLACK),
                         self.new_habit_name_tf
                     ]
                 )
@@ -84,17 +84,17 @@ class DashboardView(ft.Container):
                 alignment = ft.MainAxisAlignment.SPACE_BETWEEN,
                 controls = [
                     ft.Column([
-                        ft.Text("Dashboard", size = 30, weight = "bold"),
+                        ft.Text("Dashboard", size = 30, weight = "bold", color = ft.Colors.BLACK),
                         ft.Text(f"{weekday_name}, {month_name} {day}, {year}", size = 15, color = "black54", weight = "bold")
                     ], spacing=5),
                     # New Habit Button
                     ft.Container(
                         content = ft.Row([
-                            ft.Icon(ft.Icons.ADD, size = 20,  color = ft.Colors.BLACK),
-                            ft.Text("New Habit", size = 18, weight = "w500")
+                            ft.Icon(ft.Icons.ADD, size = 20,  color = "black34"),
+                            ft.Text("New Habit", size = 18, color = "black34", weight = "w500")
                         ], spacing = 10),
                         padding = ft.padding.all(10),
-                        border = ft.border.all(1, "black12"),
+                        border = ft.border.all(1, "grey"),
                         bgcolor = None,
                         border_radius = 8,
                         ink = True,
@@ -152,7 +152,8 @@ class DashboardView(ft.Container):
                                             habit_name, 
                                             size = 20, 
                                             weight = "bold", 
-                                            no_wrap = True
+                                            no_wrap = True,
+                                            color = ft.Colors.BLACK
                                         )
                                     ],
                                     scroll = ft.ScrollMode.ADAPTIVE,
@@ -242,7 +243,7 @@ class DashboardView(ft.Container):
         status = weekly_status[index]
 
         return ft.Container(
-            content = ft.Text(day, size = 16),
+            content = ft.Text(day, color = ft.Colors.BLACK, size = 16),
             width = 60, height = 45,
             border = ft.border.all(1, "black38"),
             border_radius = 5,

@@ -99,7 +99,7 @@ class StatisticalChart(ft.Container):
             )
         self.from_input_column = ft.Column(
             controls = [
-                ft.Text("From", size = 12, weight = "bold"),
+                ft.Text("From", size = 12, weight = "bold", color = ft.Colors.BLACK),
                 self.from_input
             ],
             spacing = 2, expand = True
@@ -114,7 +114,7 @@ class StatisticalChart(ft.Container):
         )
         self.to_input_column = ft.Column(
             controls = [
-                ft.Text("To", size = 12, weight = "bold"),
+                ft.Text("To", size = 12, weight = "bold", color = ft.Colors.BLACK),
                 self.to_input
             ],
             spacing = 2, expand = True
@@ -166,7 +166,8 @@ class StatisticalChart(ft.Container):
                                 self.habit_name, 
                                 size = 20, 
                                 weight = "bold",
-                                no_wrap = True
+                                no_wrap = True,
+                                color = ft.Colors.BLACK
                             )
                         ],
                         scroll = ft.ScrollMode.ADAPTIVE, 
@@ -201,9 +202,9 @@ class StatisticalChart(ft.Container):
                 shape = ft.RoundedRectangleBorder(radius = 5),
             ),
             segments = [
-                ft.Segment(value = "this week", label = ft.Text("this week", text_align = ft.TextAlign.CENTER)),
-                ft.Segment(value = "this month", label = ft.Text("this month", text_align = ft.TextAlign.CENTER)),
-                ft.Segment(value = "Custom", label = ft.Text("Custom", text_align = ft.TextAlign.CENTER)),
+                ft.Segment(value = "this week", label = ft.Text("this week", color = ft.Colors.BLACK, text_align = ft.TextAlign.CENTER)),
+                ft.Segment(value = "this month", label = ft.Text("this month", color = ft.Colors.BLACK, text_align = ft.TextAlign.CENTER)),
+                ft.Segment(value = "Custom", label = ft.Text("Custom", color = ft.Colors.BLACK, text_align = ft.TextAlign.CENTER)),
             ],
         )
         buttons_row = ft.Row([self.mode_buttons])
@@ -214,7 +215,7 @@ class StatisticalChart(ft.Container):
             buttons_row,
             self.custom_date_area,
             self.stats_row_area,
-            ft.Text("Rate Over Time (Daily Completion Rate)", size = 16, weight = "bold"),
+            ft.Text("Rate Over Time (Daily Completion Rate)", color = ft.Colors.BLACK, size = 16, weight = "bold"),
             self.chart_container
         ])
 
@@ -289,11 +290,11 @@ class StatisticalChart(ft.Container):
             left_axis = fch.ChartAxis(
                 label_spacing = 25,
                 labels = [
-                    fch.ChartAxisLabel(value = 0, label = ft.Text("0.0%", size = 11)),
-                    fch.ChartAxisLabel(value = 25, label = ft.Text("25.0%", size = 11)),
-                    fch.ChartAxisLabel(value = 50, label = ft.Text("50.0%", size = 11)),
-                    fch.ChartAxisLabel(value = 75, label = ft.Text("75.0%", size = 11)),
-                    fch.ChartAxisLabel(value = 100, label = ft.Text("100.0%", size = 11)),
+                    fch.ChartAxisLabel(value = 0, label = ft.Text("0.0%", size = 11, color = ft.Colors.BLACK)),
+                    fch.ChartAxisLabel(value = 25, label = ft.Text("25.0%", size = 11, color = ft.Colors.BLACK)),
+                    fch.ChartAxisLabel(value = 50, label = ft.Text("50.0%", size = 11, color = ft.Colors.BLACK)),
+                    fch.ChartAxisLabel(value = 75, label = ft.Text("75.0%", size = 11, color = ft.Colors.BLACK)),
+                    fch.ChartAxisLabel(value = 100, label = ft.Text("100.0%", size = 11, color = ft.Colors.BLACK)),
                 ],
                 label_size = 45,
             ),
@@ -321,7 +322,7 @@ class StatisticalChart(ft.Container):
             return ft.Container(
                 content = ft.Column([
                     ft.Text(title, size = 14, color = ft.Colors.GREY_700),
-                    ft.Text(value, size = 24, weight = "bold"),
+                    ft.Text(value, size = 24, weight = "bold", color = ft.Colors.BLACK),
                 ], alignment = "center", horizontal_alignment = "center"),
                 border = ft.border.all(1, ft.Colors.GREY_400),
                 border_radius = 5,
@@ -411,7 +412,7 @@ class StatisticalChart(ft.Container):
             return ft.Container(
                 content = ft.Column([
                     ft.Text(title, size = 14, color = ft.Colors.GREY_700),
-                    ft.Text(value, size = 24, weight = "bold"),
+                    ft.Text(value, size = 24, weight = "bold", color = ft.Colors.BLACK),
                 ], alignment="center", horizontal_alignment = "center"),
                 border = ft.border.all(1, ft.Colors.GREY_400),
                 border_radius = 5,
