@@ -29,8 +29,8 @@ _Screenshots coming soon._
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/<your-username>/1142-python-final-project.git
-cd 1142-python-final-project
+git clone https://github.com/<your-username>/Flet-Habit-Tracker.git
+cd Flet-Habit-Tracker
 pip install -r requirements.txt
 ```
 
@@ -78,7 +78,7 @@ Settings live in `data/settings.json` and are created with these defaults on fir
 ## Project Structure
 
 ```
-1142-python-final-project/
+Flet-Habit-Tracker/
 ├── main.py                  # Flet entry point, window setup, custom title bar
 ├── requirements.txt
 ├── assets/
@@ -160,8 +160,8 @@ Open an issue with the `enhancement` label and describe:
 ### Development Setup
 
 ```bash
-git clone https://github.com/<your-username>/1142-python-final-project.git
-cd 1142-python-final-project
+git clone https://github.com/<your-username>/Flet-Habit-Tracker.git
+cd Flet-Habit-Tracker
 python -m venv .venv
 # Windows
 .venv\Scripts\activate
