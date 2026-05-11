@@ -21,10 +21,10 @@ class AppLayout(ft.Row):
 
         # left menu area
         # create guide objects
-        dashboard_item = self.nav_item(ft.Icon(ft.Icons.DASHBOARD), "Dashboard")
-        statistics_item = self.nav_item(ft.Icon(ft.Icons.INSERT_CHART), "Statistics")
-        history_item = self.nav_item(ft.Icon(ft.Icons.HISTORY), "History")
-        setting_item = self.nav_item(ft.Icon(ft.Icons.SETTINGS), "Setting")
+        dashboard_item = self.nav_item(ft.Icon(ft.Icons.DASHBOARD, color = ft.Colors.BLACK), "Dashboard")
+        statistics_item = self.nav_item(ft.Icon(ft.Icons.INSERT_CHART, color = ft.Colors.BLACK), "Statistics")
+        history_item = self.nav_item(ft.Icon(ft.Icons.HISTORY, color = ft.Colors.BLACK), "History")
+        setting_item = self.nav_item(ft.Icon(ft.Icons.SETTINGS, color = ft.Colors.BLACK), "Setting")
 
         self.sidebar = ft.Container(
             width = 250,
@@ -84,7 +84,7 @@ class AppLayout(ft.Row):
             margin = ft.margin.symmetric(horizontal = 10, vertical = 2),
             content=ft.ListTile(
                 leading = icon_name,
-                title = ft.Text(label, size = 20, weight = "w500"),
+                title = ft.Text(label, size = 20, weight = "w500", color = ft.Colors.BLACK),
                 on_click = self.on_nav_change,
                 data = label,
             )

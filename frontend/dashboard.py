@@ -90,7 +90,7 @@ class DashboardView(ft.Container):
                     # New Habit Button
                     ft.Container(
                         content = ft.Row([
-                            ft.Icon(ft.Icons.ADD, size = 20),
+                            ft.Icon(ft.Icons.ADD, size = 20,  color = ft.Colors.BLACK),
                             ft.Text("New Habit", size = 18, weight = "w500")
                         ], spacing = 10),
                         padding = ft.padding.all(10),
